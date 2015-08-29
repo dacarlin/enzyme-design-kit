@@ -2,21 +2,16 @@
 # the friendly way to enzyme kinetics 
 
 import pandas 
-import os 
-import random
-import StringIO
-from flask import Flask, request #redirect, url_for, send_from_directory, make_response
 from numpy import diag, sqrt  
 from scipy.optimize import curve_fit
-#from werkzeug import secure_filename
+
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
+from flask import Flask, request 
+
 app = Flask( __name__ )
 app.config[ 'UPLOAD_FOLDER' ] = 'uploads' 
-
-pandas.options.display.max_colwidth = 10000 
-pandas.options.display.max_rows = 10000 
 
 def allowed_file( filename ):
   return '.' in filename and filename.rsplit('.', 1)[1] in [ 'txt', 'csv', 'xlsx' ]
@@ -35,24 +30,35 @@ def fit( df ):
     'km': '%.4f ± %.4f' % (popt[1], perr[1]),
     #'ki': '%.4f ± %.4f' % (popt[2], perr[2]),
   } )
+
+# BglB-specific values below! 
+smap = { 'A': 0.75, 'B': 0.1875, 'C': 0.047, 'D': 0.012, 'E': 0.003, 'F': 0.00075, 'G': 0.00019, 'H': 0 } 
+extcoef = 113000
+
+def assign_groups( df, smap=smap, extcoef=extcoef ):
+  'Adds substrate concentrations and calculates kobs'
+
+  df[ 's' ] = df['well'].str[0].map( smap ) 
+  df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef ) 
+  # 0.25 from the procedure, 0.0002 from standard curve 
+  
+  return df 
   
 @app.route( '/', methods=['GET', 'POST'] )
 def upload_file():
   if request.method == 'POST':
-    file = request.files[ 'file' ]
-    df = pandas.read_csv( file ) 
+    df = pandas.read_csv( request.files[ 'file' ] ) 
+    df = assign_groups( df ) 
     grouped = df.groupby( by='sample' ).apply( fit ) 
-    return '<pre>' + str( grouped ) + '</pre>'
-
-  return '''
-    <!doctype html>
-    <title>fitter.py</title>
-    <h1>Upload your data</h1>
-    <form action="" method=post enctype=multipart/form-data>
-      <input type=file name=file id=file>
-      <input type=submit value=Fit>
-    </form>
-    '''
+    return grouped.to_html() 
+  else: #GET request
+    return '''
+      <!doctype html><title>Michaelis-Menten fitter</title><h1>Upload your data</h1>
+      <form action="" method=post enctype=multipart/form-data>
+        <input type=file name=file id=file>
+        <input type=submit value=Fit>
+      </form>
+      '''
 
 if __name__ == '__main__':
   app.run( debug=True ) 
