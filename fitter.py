@@ -63,7 +63,9 @@ def upload_file():
     for name, df in grouped:
       popt, perr = do_fit( df ) 
       fig, ax = plt.subplots() 
-      fig.suptitle( name ) 
+      fig.suptitle( name )
+      #fig.xlab( 'Rate observed' )
+      #fig.ylabel( 'Substrate concentration' ) 
       ax = plt.scatter( df.s, df.kobs ) 
       img = StringIO() 
       fig.savefig( img ) 
