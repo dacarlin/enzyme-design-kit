@@ -7,8 +7,10 @@ from scipy.optimize import curve_fit
 
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
+from StringIO import StringIO 
+from base64 import b64encode
 
-from flask import Flask, request 
+from flask import Flask, request, render_template
 
 app = Flask( __name__ )
 app.config[ 'UPLOAD_FOLDER' ] = 'uploads' 
@@ -21,21 +23,24 @@ def kobs( s, kcat, km ):
   #return (kcat*s)/(km+s+(s**2/ki)) 
   #Vmax/E = ( kcat * S ) / ( Km + S + ( S^2 / Ki ) ) 
 
-def fit( df ):
+def do_fit( df ):
   p0 = ( df.kobs.max(), df.s.mean() ) #df.s.mean() ) # guesses  
   popt, pcov = curve_fit( kobs, df.s, df.kobs, p0=p0 ) 
   perr = sqrt( diag( pcov ) )
-  return pandas.Series( { 
-    'kcat': '%.0f ± %.0f' % (popt[0], perr[0]), 
-    'km': '%.4f ± %.4f' % (popt[1], perr[1]),
-    #'ki': '%.4f ± %.4f' % (popt[2], perr[2]),
-  } )
+  for i in [ 0, 1 ]:
+    if not popt[ i ] or perr[ i ] > popt[ i ]:
+      popt[ i ] = perr[ i ] = None 
+    else:
+      perr[ i ] = perr[ i ] / popt [ i ] 
+  #return { 'kcat': '%.0f ± %.0f%%' % (popt[0], perr[0]*100), 'km': '%.4f ± %.0f%%' % (popt[1], perr[1]*100) } 
+  return popt, perr 
 
 # BglB-specific values below! 
-smap = { 'A': 0.75, 'B': 0.1875, 'C': 0.047, 'D': 0.012, 'E': 0.003, 'F': 0.00075, 'G': 0.00019, 'H': 0 } 
+s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ] 
+smap2 = dict( zip( 'ABCDEFGH', s ) )  
 extcoef = 113000
 
-def assign_groups( df, smap=smap, extcoef=extcoef ):
+def assign_groups( df, smap=smap2, extcoef=extcoef ):
   'Adds substrate concentrations and calculates kobs'
 
   df[ 's' ] = df['well'].str[0].map( smap ) 
@@ -43,22 +48,31 @@ def assign_groups( df, smap=smap, extcoef=extcoef ):
   # 0.25 from the procedure, 0.0002 from standard curve 
   
   return df 
+
+print plt.style.available
+plt.style.use('ggplot') 
   
 @app.route( '/', methods=['GET', 'POST'] )
 def upload_file():
   if request.method == 'POST':
     df = pandas.read_csv( request.files[ 'file' ] ) 
     df = assign_groups( df ) 
-    grouped = df.groupby( by='sample' ).apply( fit ) 
-    return grouped.to_html() 
-  else: #GET request
-    return '''
-      <!doctype html><title>Michaelis-Menten fitter</title><h1>Upload your data</h1>
-      <form action="" method=post enctype=multipart/form-data>
-        <input type=file name=file id=file>
-        <input type=submit value=Fit>
-      </form>
-      '''
+    grouped = df.groupby( 'sample' )
+    #fits = grouped.apply( fit ) 
+    plots = [ ] 
+    for name, df in grouped:
+      popt, perr = do_fit( df ) 
+      fig, ax = plt.subplots() 
+      fig.suptitle( name ) 
+      ax = plt.scatter( df.s, df.kobs ) 
+      img = StringIO() 
+      fig.savefig( img ) 
+      plt.close( fig )  
+      img.seek( 0 )  
+      plots.append( ( name, popt, perr, b64encode( img.read() ) ) ) 
+    return render_template( 'results.html', plots=plots ) 
+  else: 
+    return render_template( 'index.html' ) 
 
 if __name__ == '__main__':
   app.run( debug=True ) 
