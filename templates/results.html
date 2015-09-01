@@ -29,25 +29,29 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <div class="table-responsive">
             <h2>Successfully tried fitting {{ plots|length }} samples </h2>
-            <p>Please find your results below. Samples without parameter estimates shown could not be fit to the Michaelis-Menten equation</p>
+            <p>Please find your results below</p>
             <table class="table">
               <thead>
                 <tr>
                   <th>#</th>
                   <th>Sample name</th>
+                  <th>Protein yield (mg/mL)</th>
                   <th><i>k</i><sub>cat</sub> (min<sup>&ndash;1</sup>)</th>
                   <th>K<sub>M</sub> (mM)</th>
                   <th>Plot</th>
                 </tr>
               </thead>
               <tbody>
-                {% for sample, popt, perr, plot in plots %}
+                {% for sample, conc, popt, perr, plot in plots %}
                 <tr>
                   <td>
-                    {{ index }}
+                    {{ loop.index }}
                   </td>
                   <td>
                     {{ sample }}
+                  </td>
+                  <td>
+                    {{ conc }}
                   </td>
                   <td>
                     {% if popt[0] > 0 %}
@@ -61,7 +65,6 @@
                   </td>
                   <td>
                     <a href="data:image/png;base64,{{ plot }}">
-                      <!-- <img src="data:image/png;base64,{{ plot }}"/> -->
                       View high-resolution plot
                     </a>
                   </td>
