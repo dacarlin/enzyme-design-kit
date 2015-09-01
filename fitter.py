@@ -31,7 +31,7 @@ def do_fit( df ):
     if not popt[ i ] or perr[ i ] > popt[ i ]:
       popt[ i ] = perr[ i ] = None 
     else:
-      perr[ i ] = perr[ i ] / popt [ i ] 
+      perr[ i ] = perr[ i ] / popt [ i ] * 100
   #return { 'kcat': '%.0f ± %.0f%%' % (popt[0], perr[0]*100), 'km': '%.4f ± %.0f%%' % (popt[1], perr[1]*100) } 
   return popt, perr 
 
@@ -49,8 +49,8 @@ def assign_groups( df, smap=smap2, extcoef=extcoef ):
   
   return df 
 
-print plt.style.available
-plt.style.use('ggplot') 
+# [u'dark_background', u'bmh', u'grayscale', u'ggplot', u'fivethirtyeight'] 
+plt.style.use('dark_background') 
   
 @app.route( '/', methods=['GET', 'POST'] )
 def upload_file():
