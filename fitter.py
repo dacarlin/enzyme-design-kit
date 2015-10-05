@@ -13,7 +13,7 @@ app = Flask( __name__ )
 app.config[ 'UPLOAD_FOLDER' ] = 'uploads'
 
 def allowed_file( filename ):
-  return '.' in filename and filename.rsplit('.', 1)[1] in [ 'txt', 'csv', 'xlsx' ]
+  return '.' in filename and filename.rsplit('.', 1)[1] in [ 'csv' ]
 
 def kobs( s, kcat, km ):
   return (kcat*s)/(km+s)
@@ -37,12 +37,11 @@ extcoef = 113000
 def assign_groups( df ):
   df[ 's' ] = df['well'].str[0].map( smap )
   df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
-  # 0.25 from the procedure, 0.0002 from standard curve
   return df
 
 @app.route( '/' )
 def index():
-    return render_template( 'help.html' )
+  return render_template( 'help.html' )
 
 @app.route( '/batch', methods=['GET', 'POST'] )
 def batch():
