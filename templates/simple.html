@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang=en>
+  <head>
+    <title>Results</title>
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <link href="/static/dashboard.css" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Fitter</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="">Help</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="/">Help</a></li>
+            <li class="active"><a href="/simple">Simple plate entry</a></li>
+            <li><a href="/batch">Batch entry</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">Simple plate entry</h1>
+          <p>
+            This form is for analysis of data from a single plate, assuming you have followed
+            the Bagel kinetic assay procedure. The <a href="/batch">batch entry form</a> is
+            better for entering large numbers of mutants at once, but requires data in a slightly
+            different format.
+          </p>
+          <form class="form-simple" action="" method=post>
+            <div class="row">
+              <div class="col-sm-6">
+                <table class="mutant-table">
+                  <tr class="entry-form-head">
+                    <td></td>
+                    <td>Mutant name</td>
+                    <td>Yield (mg/mL)</td>
+                    <td>Dilution</td>
+                  </tr>
+                  <tr class="mutant-row">
+                    <td>1</td>
+                    <td><input type="text" name="mut1-name" placeholder="A123B" required></td>
+                    <td><input type="text" name="mut1-yield" placeholder="1.1" required></td>
+                    <td><select name="mut1-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
+                  </tr>
+                  <tr class="mutant-row">
+                    <td>2</td>
+                    <td><input type="text" name="mut2-name" placeholder="C456D" required></td>
+                    <td><input type="text" name="mut2-yield" placeholder="1.2" required></td>
+                    <td><select name="mut2-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
+                  </tr>
+                  <tr class="mutant-row">
+                    <td>3</td>
+                    <td><input type="text" name="mut3-name" placeholder="E123F" required></td>
+                    <td><input type="text" name="mut3-yield" placeholder="1.3" required></td>
+                    <td><select name="mut3-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
+                  </tr>
+                  <tr class="mutant-row">
+                    <td>4</td>
+                    <td><input type="text" name="mut4-name" placeholder="G456H" required></td>
+                    <td><input type="text" name="mut4-yield" placeholder="1.4" required></td>
+                    <td><select name="mut4-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-sm-4">
+                <input type="textarea" name="data" placeholder="">
+              </div>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block submit-button" type="submit">Analyze this plate</button>
+          </form>
+        </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
