@@ -1,9 +1,8 @@
 /*my styles*/
 
-td img { width: 280px; }
-.form-signin { width: 400px; margin: 0 auto;}
-.submit-button { margin-top: 20px; }
-
+table.mutant-table tr td {
+  padding: 0 1em 1em 0;
+}
 
 /*
  * Base structure
@@ -110,4 +109,3 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
-
