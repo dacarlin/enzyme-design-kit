@@ -4,5 +4,4 @@ This is a web app for fitting experimental data to the Michaelis-Menten equation
 
 ## Notes 
 
-It's got a lot of scientific Python dependencies. For this reason, it's required that you install the [Anaconda Python distribution](https://www.continuum.io/downloads). 
-
++ It's got a lot of scientific Python dependencies. For this reason, the prereqs are [Anaconda Python distribution](https://www.continuum.io/downloads) with [Flask](http://flask.pocoo.org) installed 
