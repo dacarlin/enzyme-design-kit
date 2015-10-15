@@ -2,7 +2,8 @@ import pandas
 from numpy import diag, sqrt
 from scipy.optimize import curve_fit
 
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib import use; use( 'Agg' )
+#from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 from StringIO import StringIO
 from base64 import b64encode
@@ -11,6 +12,7 @@ from flask import Flask, request, render_template
 
 app = Flask( __name__ )
 app.config[ 'UPLOAD_FOLDER' ] = 'uploads'
+app.debug = True 
 
 def allowed_file( filename ):
   return '.' in filename and filename.rsplit('.', 1)[1] in [ 'csv' ]
@@ -143,4 +145,4 @@ def simple():
     return render_template( 'simple.html' )
 
 if __name__ == '__main__':
-  app.run( debug=True )
+  app.run() 
