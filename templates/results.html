@@ -9,11 +9,11 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Fitter</a>
+          <a class="navbar-brand" href="/">Bagel: Data Analysis</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="">Help</a></li>
+            <li><a href="/">Help</a></li>
           </ul>
         </div>
       </div>
@@ -23,8 +23,8 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li><a href="/">Help</a></li>
-            <li><a href="/simple">Simple plate entry</a></li>
-            <li><a href="/batch">Batch entry</a></li>
+            <li><a href="/plate">Plate</a></li>
+            <li><a href="/batch">Batch</a></li>
           </ul>
           <ul class="nav nav-sidebar">
             <li class="active"><a href="#">Results</a></li>
@@ -33,7 +33,22 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <div class="table-responsive">
             <h2>Successfully tried fitting {{ plots|length }} samples </h2>
-            <p>Please find your results below</p>
+            <p>
+              In the rows, a kinetic parameter not displayed means that either 
+            </p>
+            
+            <ol>
+              <li>the algorithm used to fit the samples (<code>scipy.optimize.curve_fit</code>) failed after 800 attempts</li>
+              <li>the standard error of the parameter was calculated to be larger than the parameter</li>
+            </ol>
+            
+            <p>
+              For parameters estimated to be less than standard errors, percent error is reported.
+            </p>
+            <p>
+              Samples with yields below the published limit of detection for this project are marked in red.
+            </p>
+
             <table class="table">
               <thead>
                 <tr>
@@ -55,7 +70,11 @@
                     {{ sample }}
                   </td>
                   <td>
-                    {{ conc }}
+                    {% if conc|float < 0.15 %}
+                      <span style="color:red;">{{ conc }}</span>
+                    {% else %}
+                      {{ conc }}
+                    {% endif %}
                   </td>
                   <td>
                     {% if popt[0] > 0 %}

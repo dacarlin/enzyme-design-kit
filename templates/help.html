@@ -9,7 +9,7 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Fitter</a>
+          <a class="navbar-brand" href="/help">Bagel: Data Analysis</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
@@ -23,13 +23,30 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li class="active"><a href="/">Help</a></li>
-            <li><a href="/simple">Simple plate entry</a></li>
-            <li><a href="/batch">Batch entry</a></li>
+            <li><a href="/plate">Plate</a></li>
+            <li><a href="/batch">Batch</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Fit data to the Michaelis-Menten equation</h1>
-          <p>To begin, choose an entry method from the sidebar at left</p>
+          <h1 class="page-header">Bagel data analysis tool</h1>
+          <p>
+            This is a tool for determining the kinetic parameters of the enzymes you designed. 
+          </p>
+          
+          <h2>
+            <a href="/plate">Enter a plate</a>
+          </h2>
+          <p>
+            Enter a plate straight from the spectrophotometer. 
+          </p>
+          
+          <h2>
+            <a href="/batch">Batch entry</a>
+          </h2>
+          <p>
+            Enter data that's already been worked up according to <a href="https://github.com/dacarlin/michaelis_menten_fitter/blob/master/example_notebook.ipynb">the example</a>. Try the <a href="/static/example_data_multiple_samples.csv">example data</a>.
+          </p>
+          
         </div>
         </div>
       </div>

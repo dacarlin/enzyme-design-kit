@@ -9,11 +9,11 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Fitter</a>
+          <a class="navbar-brand" href="/">Bagel: Data Analysis</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="">Help</a></li>
+            <li><a href="/">Help</a></li>
           </ul>
         </div>
       </div>
@@ -23,17 +23,20 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li><a href="/">Help</a></li>
-            <li class="active"><a href="/simple">Simple plate entry</a></li>
-            <li><a href="/batch">Batch entry</a></li>
+            <li class="active"><a href="/simple">Plate</a></li>
+            <li><a href="/batch">Batch</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Simple plate entry</h1>
+          <h1 class="page-header">Analyze a plate</h1>
+          <p class="lead">
+            This form is for quick analysis of data from a single plate. If you've followed
+            the Bagel kinetic assay procedure, you can use this tool to analyze your kinetic data. 
+          </p>
           <p>
-            This form is for analysis of data from a single plate, assuming you have followed
-            the Bagel kinetic assay procedure. The <a href="/batch">batch entry form</a> is
-            better for entering large numbers of mutants at once, but requires data in a slightly
-            different format.
+            Paste in the data from the Gen5 below. The <a href="/batch">batch entry form</a> is
+            better for entering large numbers of mutants at once, but requires that you work up your data
+            before hand. This form accepts raw data from the Gen5 software. 
           </p>
           <form class="form-simple" action="" method=post>
             <div class="row">
@@ -72,6 +75,7 @@
                 </table>
               </div>
               <div class="col-sm-4">
+                <label for="data">Select the "Well" and "Max V [420]" columns from Gen5, right-click and choose "Copy to clipboard" and paste here</label>
                 <input type="textarea" name="data" placeholder="">
               </div>
             </div>

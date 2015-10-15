@@ -4,6 +4,11 @@ table.mutant-table tr td {
   padding: 0 1em 1em 0;
 }
 
+.file {
+  margin-bottom: 1em;
+}
+
+
 /*
  * Base structure
  */
@@ -90,22 +95,3 @@ body {
   margin-top: 0;
 }
 
-
-/*
- * Placeholder dashboard ideas
- */
-
-.placeholders {
-  margin-bottom: 30px;
-  text-align: center;
-}
-.placeholders h4 {
-  margin-bottom: 0;
-}
-.placeholder {
-  margin-bottom: 20px;
-}
-.placeholder img {
-  display: inline-block;
-  border-radius: 50%;
-}

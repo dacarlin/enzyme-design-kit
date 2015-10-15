@@ -3,7 +3,6 @@ from numpy import diag, sqrt
 from scipy.optimize import curve_fit
 
 from matplotlib import use; use( 'Agg' )
-#from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 from StringIO import StringIO
 from base64 import b64encode
@@ -67,7 +66,7 @@ def batch():
   else:
     return render_template( 'batch.html' )
 
-@app.route( '/simple', methods=['GET', 'POST'] )
+@app.route( '/plate', methods=['GET', 'POST'] )
 def simple():
   if request.method == 'POST':
     clean_dat = request.form.get( 'data' ).replace('Max V [420]', 'rate').replace(' ', '\n').lower()
@@ -143,6 +142,6 @@ def simple():
     return render_template( 'results.html', plots=plots )
   else:
     return render_template( 'simple.html' )
-
+    
 if __name__ == '__main__':
   app.run() 
