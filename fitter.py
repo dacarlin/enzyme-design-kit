@@ -11,7 +11,7 @@ from flask import Flask, request, render_template
 
 app = Flask( __name__ )
 app.config[ 'UPLOAD_FOLDER' ] = 'uploads'
-app.debug = True 
+app.debug = True
 
 def allowed_file( filename ):
   return '.' in filename and filename.rsplit('.', 1)[1] in [ 'csv' ]
@@ -72,50 +72,9 @@ def simple():
     clean_dat = request.form.get( 'data' ).replace('Max V [420]', 'rate').replace(' ', '\n').lower()
     df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
 
-    samplemap = {
-        '1': request.form.get( 'mut1-name' ),
-        '2': request.form.get( 'mut1-name' ),
-        '3': request.form.get( 'mut1-name' ),
-        '4': request.form.get( 'mut2-name' ),
-        '5': request.form.get( 'mut2-name' ),
-        '6': request.form.get( 'mut2-name' ),
-        '7': request.form.get( 'mut3-name' ),
-        '8': request.form.get( 'mut3-name' ),
-        '9': request.form.get( 'mut3-name' ),
-        '10': request.form.get( 'mut4-name' ),
-        '11': request.form.get( 'mut4-name' ),
-        '12': request.form.get( 'mut4-name' ),
-    }
-
-    yieldmap = {
-        '1': request.form.get( 'mut1-yield' ),
-        '2': request.form.get( 'mut1-yield' ),
-        '3': request.form.get( 'mut1-yield' ),
-        '4': request.form.get( 'mut2-yield' ),
-        '5': request.form.get( 'mut2-yield' ),
-        '6': request.form.get( 'mut2-yield' ),
-        '7': request.form.get( 'mut3-yield' ),
-        '8': request.form.get( 'mut3-yield' ),
-        '9': request.form.get( 'mut3-yield' ),
-        '10': request.form.get( 'mut4-yield' ),
-        '11': request.form.get( 'mut4-yield' ),
-        '12': request.form.get( 'mut4-yield' ),
-    }
-
-    dilutionmap = {
-        '1': request.form.get( 'mut1-dilution' ),
-        '2': request.form.get( 'mut1-dilution' ),
-        '3': request.form.get( 'mut1-dilution' ),
-        '4': request.form.get( 'mut2-dilution' ),
-        '5': request.form.get( 'mut2-dilution' ),
-        '6': request.form.get( 'mut2-dilution' ),
-        '7': request.form.get( 'mut3-dilution' ),
-        '8': request.form.get( 'mut3-dilution' ),
-        '9': request.form.get( 'mut3-dilution' ),
-        '10': request.form.get( 'mut4-dilution' ),
-        '11': request.form.get( 'mut4-dilution' ),
-        '12': request.form.get( 'mut4-dilution' ),
-    }
+    samplemap = { str(i+1): request.form.get( 'mut{}-name'.format( (i/3)+1 ) ) for i in range(12) }
+    yieldmap = { str(i+1): request.form.get( 'mut{}-yield'.format( (i/3)+1 ) ) for i in range(12) }
+    dilutionmap = { str(i+1): request.form.get( 'mut{}-dilution'.format( (i/3)+1 ) ) for i in range(12) }
 
     df[ 's' ] = df['well'].str[0].map( dict( zip( 'abcdefgh', s ) ) )
     df[ 'sample' ] = df['well'].str[1:].map( samplemap )
@@ -142,6 +101,6 @@ def simple():
     return render_template( 'results.html', plots=plots )
   else:
     return render_template( 'simple.html' )
-    
+
 if __name__ == '__main__':
-  app.run() 
+  app.run()
