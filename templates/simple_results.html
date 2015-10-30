@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang=en>
+  <head>
+    <title>Results</title>
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <link href="/static/dashboard.css" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Bagel: Data Analysis</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/">Help</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="/">Help</a></li>
+            <li><a href="/plate">Plate</a></li>
+            <li><a href="/batch">Batch</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">Results</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div class="table-responsive">
+            <h2>Successfully tried fitting {{ plots|length }} samples </h2>
+            <p class="lead">
+              Make sure to check the fits
+              and the Gen5&ndash;calculated rates to make sure they make sense
+            </p>
+
+            <div class="row">
+              <div class="col-lg-12">
+                {% for sample, conc, popt, perr, plot in plots %}
+                <div class="result_box">
+                  <a href="data:image/png;base64,{{ plot }}">
+                    <img src="data:image/png;base64,{{ plot }}" />
+                  </a>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-lg-7">
+                <h2>Results of 4 fits</h2>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Sample name</th>
+                      <th>Protein yield (mg/mL)</th>
+                      <th><i>k</i><sub>cat</sub> (min<sup>&ndash;1</sup>)</th>
+                      <th>K<sub>M</sub> (mM)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for sample, conc, popt, perr, plot in plots %}
+                    <tr>
+                      <td>
+                        {{ loop.index }}
+                      </td>
+                      <td>
+                        {{ sample }}
+                      </td>
+                      <td>
+                        {% if conc|float < 0.15 %}<span style="color:red;">{{ conc }}</span>{% else %}{{ conc }}{% endif %}
+                      </td>
+                      <td>
+                        {% if popt[0] > 10 %}
+                          {{ '{0:0.0f} ± {1:0.0f}%'.format( popt[0], perr[0] ) }}
+                        {% else %}
+                          < 10
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if popt[1] > 0 %}
+                          {{ '{0:0.1f} ± {1:0.0f}%'.format( popt[1]*1000, perr[1] ) }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-sm-5">
+                <h2>Help!</h2>
+                <p>
+                  In the rows, a kinetic parameter not displayed means that either
+                </p>
+
+                <ol>
+                  <li>the algorithm used to fit the samples (<code>scipy.optimize.curve_fit</code>) failed after 800 attempts</li>
+                  <li>the standard error of the parameter was calculated to be larger than the parameter</li>
+                </ol>
+
+                <p>
+                  For parameters estimated to be less than standard errors, percent error is reported.
+                </p>
+                <p>
+                  Samples with yields below the published limit of detection for this project are marked in red.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

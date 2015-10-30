@@ -8,6 +8,16 @@ table.mutant-table tr td {
   margin-bottom: 1em;
 }
 
+div.result_box {
+  width: 25%;
+  background: #eef;
+  float: left;
+}
+
+div.result_box img {
+  width: 100%;
+}
+
 
 /*
  * Base structure
@@ -94,4 +104,3 @@ body {
 .main .page-header {
   margin-top: 0;
 }
-

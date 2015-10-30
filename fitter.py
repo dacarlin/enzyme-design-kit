@@ -1,5 +1,5 @@
 import pandas
-from numpy import diag, sqrt
+from numpy import diag, sqrt, linspace
 from scipy.optimize import curve_fit
 
 from matplotlib import use; use( 'Agg' )
@@ -82,23 +82,45 @@ def simple():
     df[ 'dilution' ] = df['well'].str[1:].map( dilutionmap ).astype( 'float' )
     df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
 
-    print df
-
     grouped = df.groupby( 'sample' )
     plots = [ ]
+
+    from matplotlib.ticker import FuncFormatter
+    def substrateFormatter(x, pos):
+        if x < 0 or x > 0.090:
+            return ''
+        else:
+            return int( x * 1000 )
+
+    def rateFormatter(x, pos):
+        if x < 0:
+            return ''
+        elif 0 < x < 5:
+            return '{:0.1f}'.format( x )
+        else:
+            return int( x )
 
     for name, df in grouped:
       conc = '{0:.2f}'.format( df['yield'].mean() )
       popt, perr = do_fit( df )
-      fig, ax = plt.subplots()
-      fig.suptitle( name )
-      ax = plt.scatter( df.s, df.kobs )
+      fig, ax = plt.subplots( figsize=(4,4) )
+      ax.set_title( name )
+      ax.scatter( df.s, df.kobs, color='burlywood', alpha=0.99 )
+      xvals = linspace( df.s.min(), df.s.max(), 100 )
+      ax.plot( xvals, kobs( xvals, *popt ), alpha=0.45, color='#222222' )
+      ax.xaxis.set_major_formatter(FuncFormatter(substrateFormatter))
+      ax.yaxis.set_major_formatter(FuncFormatter(rateFormatter))
+      ax.set_xlabel( 'Substrate concentration (mM)' )
+      ax.set_ylabel( 'Rate (min$^{-1}$)' )
+      plt.tight_layout()
       img = StringIO()
       fig.savefig( img )
       plt.close( fig )
       img.seek( 0 )
       plots.append( ( name, conc, popt, perr, b64encode( img.read() ) ) )
-    return render_template( 'results.html', plots=plots )
+
+    return render_template( 'simple_results.html', plots=plots )
+
   else:
     return render_template( 'simple.html' )
 
