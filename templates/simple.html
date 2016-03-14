@@ -9,7 +9,8 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="main col-12-md">
+    <div class="col-md-3"></div>
+    <div class="main col-md-6">
       <form action="" method=post>
         <h1 class="page-header">Analyze a plate</h1>
         <p class="lead">
@@ -19,9 +20,9 @@
         <table class="mutant-table">
           <tr class="entry-form-head">
             <td></td>
-            <td><b>Mutant name</b><br><em>e.g., W120F</em></td>
-            <td><b>Protein yield</b><br><em>mg/mL</em></td></td>
-            <td><b>Dilution</b><br><em>&nbsp;</em></td>
+            <td><b>Mutant name</b><br><em>e.g.</em>, W120F</td>
+            <td><b>Protein yield</b><br>mg/mL</td></td>
+            <td><b>Dilution</b><br><em>required</em></td>
           </tr>
           <tr class="mutant-row">
           {% for i in range( 4 ) %}

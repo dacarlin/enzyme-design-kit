@@ -94,9 +94,16 @@ def simple():
 
     # iterate over 4 samples by name, in entered order (see sort=False above)
     for name, df in grouped:
+      notes = []
       conc = '{0:.2f}'.format( df['yield'].mean() )
+      if float( conc ) < 0.2:
+          notes.append( 'Protein yield is below 0.2 mg/mL' )
       # this seems hacky, what if the sample names overlap?
       popt, perr = do_fit( df )
+      if perr[0] > 25:
+          notes.append( 'kcat error is greater than 25%' )
+      if perr[1] > 25:
+          notes.append( 'KM error is greater than 25%' )
       fig, ax = plt.subplots( figsize=(3,3) )
       ax.scatter( df.s, df.kobs, color='cornflowerblue', alpha=0.9, marker='.' )
       xvals = linspace( df.s.min(), df.s.max(), 100 )
@@ -119,7 +126,7 @@ def simple():
       img.seek( 0 )
 
       # collect everything
-      samples.append( ( name, conc, popt, perr, img.read() ) )
+      samples.append( ( name, conc, popt, perr, img.read(), notes ) )
 
     return render_template( 'results.html', samples=samples )
 

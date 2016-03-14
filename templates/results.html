@@ -3,23 +3,50 @@
 {% block head %}
     {{ super() }}
 {% endblock %}
+
 {% block content %}
 <div class="container">
-{% for name, conc, popt, perr, plot in samples %}
+
   <div class="row result">
-      <div class="col-md-4">
-        <h2>{{name}}</h2>
-        <p><em>k</em><sub>cat</sub> {{ popt[0]|round(1) }} ± {{ perr[0]|round|int }}%</p>
-        <p>K<sub>M</sub> {{(popt[1] * 1000)|round(1)}} ± {{perr[1]|round|int}}%</p>
-      </div>
-      <div class="col-md-4">
-        <a href="data:image/svg+xml;utf8,{{plot}}">
-          <img src='data:image/svg+xml;utf8,{{plot}}'>
-        </a>
-      </div>
-      <div class="col-md-4">
+  {% for name, conc, popt, perr, plot, notes in samples %}
+    <div class="col-md-3">
+      <a href="data:image/svg+xml;utf8,{{plot}}">
+        <img src='data:image/svg+xml;utf8,{{plot}}'>
+      </a>
+      {% for note in notes %}
+        <small><b>WARNING</b></small> {{note}}
+      {% endfor %}
+    </div>
+  {% endfor %}
+  </div>
+
+  <div class="row">
+    {% for name, conc, popt, perr, plot, notes in samples %}
+    <div class="col-sm-6 col-md-3">
+      <div class="thumbnail">
+        <img src="data:image/svg+xml;utf8,{{plot}}" alt="...">
+        <div class="caption">
+          <h3>{{name}}</h3>
+          <!-- <p>{{popt}} {{perr}}</p> -->
+          <p>{% for note in notes %}
+            <small><b>WARNING</b></small> {{note}}
+          {% endfor %}</p>
+          <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+        </div>
       </div>
     </div>
-{% endfor %}
+    {% endfor %}
+  </div>
+
+<!-- csv -->
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Results as CSV</h3>
+        <pre>sample,protein_yield,kcat,percent_err_kcat,km,percent_err_km
+{% for name, conc, popt, perr, plot, notes in samples -%}
+{{name}},{{conc}},{{popt[0]|round(1)}},{{perr[0]|round(1)}}%,{{(popt[1]*1000)|round(2)}},{{perr[1]|round(1)}}%{{'\n'}}
+{%- endfor %}</pre>
+    </div>
+  </div>
 </div>
 {% endblock %}
