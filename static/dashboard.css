@@ -1,5 +1,14 @@
 /*my styles*/
 
+.example div {
+  display: none;
+}
+
+form {
+  padding: 20px;
+  font-size: 18px;
+}
+
 table.mutant-table tr td {
   padding: 0 1em 1em 0;
 }

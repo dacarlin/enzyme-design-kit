@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+    <div id="header">
+      <b>Bagel data analysis</b>
+      <a href="/">Analyze a plate</a>
+      <a href="/batch">Batch entry</a>
+    </div>
+    {% block content %}{% endblock %}
+    <div id="footer">
+        {% block footer %}{% endblock %}
+    </div>
+</body>
+</html>

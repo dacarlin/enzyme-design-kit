@@ -1,4 +1,5 @@
 import pandas
+import datetime
 from numpy import diag, sqrt, linspace
 from scipy.optimize import curve_fit
 
@@ -20,37 +21,32 @@ def kobs( s, kcat, km ):
   return (kcat*s)/(km+s)
 
 def do_fit( df ):
-  p0 = ( df.kobs.max(), df.s.mean() )
-  popt, pcov = curve_fit( kobs, df.s, df.kobs, p0=p0 )
-  perr = sqrt( diag( pcov ) )
-  for i in [ 0, 1 ]:
-    if not popt[ i ] or perr[ i ] > popt[ i ]:
-      popt[ i ] = perr[ i ] = None
-    else:
-      perr[ i ] = perr[ i ] / popt [ i ] * 100
-  return popt, perr
+  try:
+    p0 = ( df.kobs.max(), df.s.mean() )
+    popt, pcov = curve_fit( kobs, df.s, df.kobs, p0=p0 )
+    perr = sqrt( diag( pcov ) ) / popt * 100
+    return popt, perr
+  except Exception as e:
+    print e
+    return [], []
 
 # BglB-specific values below!
 s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
 smap = dict( zip( 'ABCDEFGH', s ) )
 extcoef = 113000
 
-def assign_groups( df ):
+def clean( df ):
   df[ 's' ] = df['well'].str[0].map( smap )
   df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
   return df
-
-@app.route( '/' )
-def index():
-  return render_template( 'help.html' )
 
 @app.route( '/batch', methods=['GET', 'POST'] )
 def batch():
   if request.method == 'POST':
     df = pandas.read_csv( request.files[ 'file' ] )
-    df = assign_groups( df )
+    df = clean( df )
     grouped = df.groupby( 'sample' )
-    plots = [ ]
+    samples = [ ]
     for name, df in grouped:
       conc = '{0:.2f}'.format( df['yield'].mean() )
       popt, perr = do_fit( df )
@@ -61,67 +57,74 @@ def batch():
       fig.savefig( img )
       plt.close( fig )
       img.seek( 0 )
-      plots.append( ( name, conc, popt, perr, b64encode( img.read() ) ) )
-    return render_template( 'results.html', plots=plots )
+      samples.append( ( name, conc, popt, perr, b64encode( img.read() ) ) )
+    return render_template( 'batch_results.html', plots=plots )
   else:
     return render_template( 'batch.html' )
 
-@app.route( '/plate', methods=['GET', 'POST'] )
+@app.route( '/', methods=['GET', 'POST'] )
 def simple():
   if request.method == 'POST':
+    # read in form
     clean_dat = request.form.get( 'data' ).replace('Max V [420]', 'rate').replace(' ', '\n').lower()
+
+    # turn into pandas df
     df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
 
+    # these are bglb-assay--specific
     samplemap = { str(i+1): request.form.get( 'mut{}-name'.format( (i/3)+1 ) ) for i in range(12) }
     yieldmap = { str(i+1): request.form.get( 'mut{}-yield'.format( (i/3)+1 ) ) for i in range(12) }
     dilutionmap = { str(i+1): request.form.get( 'mut{}-dilution'.format( (i/3)+1 ) ) for i in range(12) }
 
+    # construct a useful dataframe from the raw data
+    df.dropna( inplace=True )
+    df = df[( df.rate > 0 )]
     df[ 's' ] = df['well'].str[0].map( dict( zip( 'abcdefgh', s ) ) )
     df[ 'sample' ] = df['well'].str[1:].map( samplemap )
     df[ 'yield' ] = df['well'].str[1:].map( yieldmap ).astype( 'float' )
     df[ 'dilution' ] = df['well'].str[1:].map( dilutionmap ).astype( 'float' )
     df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
 
-    grouped = df.groupby( 'sample' )
-    plots = [ ]
+    # save this data set
+    df.to_csv( 'saved_runs/submitted_{}.csv'.format( datetime.datetime.now() ) )
 
-    from matplotlib.ticker import FuncFormatter
-    def substrateFormatter(x, pos):
-        if x < 0 or x > 0.090:
-            return ''
-        else:
-            return int( x * 1000 )
+    # group df by sample
+    grouped = df.groupby( 'sample', sort=False )
+    samples = [ ]
 
-    def rateFormatter(x, pos):
-        if x < 0:
-            return ''
-        elif 0 < x < 5:
-            return '{:0.1f}'.format( x )
-        else:
-            return int( x )
-
+    # iterate over 4 samples by name, in entered order (see sort=False above)
     for name, df in grouped:
       conc = '{0:.2f}'.format( df['yield'].mean() )
+      # this seems hacky, what if the sample names overlap?
       popt, perr = do_fit( df )
-      fig, ax = plt.subplots( figsize=(4,4) )
-      ax.set_title( name )
-      ax.scatter( df.s, df.kobs, color='burlywood', alpha=0.99 )
+      fig, ax = plt.subplots( figsize=(3,3) )
+      ax.scatter( df.s, df.kobs, color='cornflowerblue', alpha=0.9, marker='.' )
       xvals = linspace( df.s.min(), df.s.max(), 100 )
-      ax.plot( xvals, kobs( xvals, *popt ), alpha=0.45, color='#222222' )
-      ax.xaxis.set_major_formatter(FuncFormatter(substrateFormatter))
-      ax.yaxis.set_major_formatter(FuncFormatter(rateFormatter))
-      ax.set_xlabel( 'Substrate concentration (mM)' )
+
+      if popt[0] > 1:
+        ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
+
+      ax.set_title( name )
+      ax.set_xlabel( '[pNPG] (M)' )
       ax.set_ylabel( 'Rate (min$^{-1}$)' )
+      ax.set_xticks( [ 0, 0.04, 0.08 ] )
+      yticks = ax.get_yticks()
+      ax.set_yticks( yticks[1:-1] )
       plt.tight_layout()
+
+      # encode plot as a string
       img = StringIO()
-      fig.savefig( img )
+      fig.savefig( img, format='svg' )
       plt.close( fig )
       img.seek( 0 )
-      plots.append( ( name, conc, popt, perr, b64encode( img.read() ) ) )
 
-    return render_template( 'simple_results.html', plots=plots )
+      # collect everything
+      samples.append( ( name, conc, popt, perr, img.read() ) )
+
+    return render_template( 'results.html', samples=samples )
 
   else:
+    # not a POST request, is GET request
     return render_template( 'simple.html' )
 
 if __name__ == '__main__':

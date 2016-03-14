@@ -23,67 +23,73 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li><a href="/">Help</a></li>
-            <li><a href="/plate">Simple plate entry</a></li>
-            <li class="active"><a href="/batch">Batch entry</a></li>
+            <li><a href="/plate">Plate</a></li>
+            <li class="active"><a href="/batch">Batch</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Batch entry for well-formed data</h1>
-          <p class="lead">This form is limited to data that is in CSV format where each row is an observation. This is a convenient way to enter large numbers 
-             of mutants. 
-          </p>
-          <p>
-            The format expected is 
-             
-          </p>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>
-                  sample
-                </th>
-                <th>
-                  well
-                </th>
-                <th>
-                  yield
-                </th>
-                <th>
-                  dilution
-                </th>
-                <th>
-                  rate
-                </th>
-                
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  string
-                </td>
-                <td>
-                  string
-                </td>
-                <td>
-                  mg/mL
-                </td>
-                <td>
-                  float
-                </td>
-                <td>
-                  float
-                </td>
-                
-              </tr>
-            </tbody>
-          </table>
+          <h1 class="page-header">Batch entry Michaelis-Menten fits</h1>
+          <div class="row">
+            <div class=col-md-6>
+              <p class="lead">Use this form for data in CSV format where each row is an observation.</p>
+              <form class="form-signin" action="" method=post enctype=multipart/form-data>
+                <label for="file">Upload your data </label>
+                <input type="file" name="file" id="file" class="file" placeholder="Your data" required>
+                <button class="btn btn-lg btn-primary btn-block submit-button" type="submit">Fit my data</button>
+              </form>
+            </div>
+            <div class="col-md-6">
+              <h2>Expected input</h2>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>
+                      sample
+                    </th>
+                    <th>
+                      well
+                    </th>
+                    <th>
+                      yield
+                    </th>
+                    <th>
+                      dilution
+                    </th>
+                    <th>
+                      rate
+                    </th>
 
-          <form class="form-signin" action="" method=post enctype=multipart/form-data>
-            <label for="file">Data in CSV format</label>
-            <input type="file" name="file" id="file" class="file" placeholder="Your data" required>
-            <button class="btn btn-lg btn-primary btn-block submit-button" type="submit">Fit my data</button>
-          </form>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      string
+                    </td>
+                    <td>
+                      string
+                    </td>
+                    <td>
+                      mg/mL
+                    </td>
+                    <td>
+                      float
+                    </td>
+                    <td>
+                      float
+                    </td>
+
+                  </tr>
+                </tbody>
+              </table>
+
+              <p>
+                The format expected is depicted in the table at right. <a href='/static/csv_template.csv' class="btn btn-primary">Download a CSV template</a>.
+              </p>
+              <p>Also see the <a href='/static/example_data_multiple_samples.csv'>example data</a> and a fully-worked up <a href="https://github.com/dacarlin/michaelis_menten_fitter/blob/master/example_notebook.ipynb">example notebook</a>.</p>
+
+            </div>
+          </div>
 
         </div>
         </div>
