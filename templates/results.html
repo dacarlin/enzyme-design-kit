@@ -6,35 +6,40 @@
 
 {% block content %}
 <div class="container">
-
-  <div class="row result">
-  {% for name, conc, popt, perr, plot, notes in samples %}
-    <div class="col-md-3">
-      <a href="data:image/svg+xml;utf8,{{plot}}">
-        <img src='data:image/svg+xml;utf8,{{plot}}'>
-      </a>
-      {% for note in notes %}
-        <small><b>WARNING</b></small> {{note}}
-      {% endfor %}
-    </div>
-  {% endfor %}
-  </div>
-
+  <div style="margin-top:1.8em"></div>
   <div class="row">
     {% for name, conc, popt, perr, plot, notes in samples %}
     <div class="col-sm-6 col-md-3">
-      <div class="thumbnail">
-        <img src="data:image/svg+xml;utf8,{{plot}}" alt="...">
-        <div class="caption">
-          <h3>{{name}}</h3>
-          <!-- <p>{{popt}} {{perr}}</p> -->
-          <p>{% for note in notes %}
-            <small><b>WARNING</b></small> {{note}}
-          {% endfor %}</p>
-          <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">{{name}}</h3>
+        </div>
+        <div class="panel-body">
+          <img src="data:image/svg+xml;utf8,{{plot}}" alt="...">
+          {% for note in notes %}
+            <div class="alert alert-warning" role="alert"><small><b>WARNING</b></small> {{note|safe}}</div>
+          {% endfor %}
+            <!-- <p><a href="#" class="btn btn-primary" role="button">Download</a> <a href="#" class="btn" role="button">Discard</a></p> -->
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Yeild</th>
+                <th><em>k</em><sub>cat</sub></th>
+                <th>K<sub>M</sub></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{conc}}</td>
+                <td>{{popt[0]|round(1)}}&nbsp;±&nbsp;{{perr[0]|round(1)}}%</td>
+                <td>{{(popt[1]*1000)|round(1)}}&nbsp;±&nbsp;{{perr[1]|round(1)}}%</td>
+              </tr>
+            </tbody>
+          </table>
+
         </div>
       </div>
-    </div>
     {% endfor %}
   </div>
 

@@ -101,9 +101,9 @@ def simple():
       # this seems hacky, what if the sample names overlap?
       popt, perr = do_fit( df )
       if perr[0] > 25:
-          notes.append( 'kcat error is greater than 25%' )
+          notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
       if perr[1] > 25:
-          notes.append( 'KM error is greater than 25%' )
+          notes.append( 'K<sub>M</sub> error is greater than 25%' )
       fig, ax = plt.subplots( figsize=(3,3) )
       ax.scatter( df.s, df.kobs, color='cornflowerblue', alpha=0.9, marker='.' )
       xvals = linspace( df.s.min(), df.s.max(), 100 )
