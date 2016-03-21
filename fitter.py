@@ -1,21 +1,18 @@
 import pandas
 import datetime
+
 from numpy import diag, sqrt, linspace
 from scipy.optimize import curve_fit
 
 from matplotlib import use; use( 'Agg' )
 import matplotlib.pyplot as plt
+
 from StringIO import StringIO
-from base64 import b64encode
 
 from flask import Flask, request, render_template
 
 app = Flask( __name__ )
-app.config[ 'UPLOAD_FOLDER' ] = 'uploads'
-app.debug = True
-
-def allowed_file( filename ):
-  return '.' in filename and filename.rsplit('.', 1)[1] in [ 'csv' ]
+app.debug = True 
 
 def kobs( s, kcat, km ):
   return (kcat*s)/(km+s)
@@ -35,33 +32,7 @@ s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
 smap = dict( zip( 'ABCDEFGH', s ) )
 extcoef = 113000
 
-def clean( df ):
-  df[ 's' ] = df['well'].str[0].map( smap )
-  df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
-  return df
-
-@app.route( '/batch', methods=['GET', 'POST'] )
-def batch():
-  if request.method == 'POST':
-    df = pandas.read_csv( request.files[ 'file' ] )
-    df = clean( df )
-    grouped = df.groupby( 'sample' )
-    samples = [ ]
-    for name, df in grouped:
-      conc = '{0:.2f}'.format( df['yield'].mean() )
-      popt, perr = do_fit( df )
-      fig, ax = plt.subplots()
-      fig.suptitle( name )
-      ax = plt.scatter( df.s, df.kobs )
-      img = StringIO()
-      fig.savefig( img )
-      plt.close( fig )
-      img.seek( 0 )
-      samples.append( ( name, conc, popt, perr, b64encode( img.read() ) ) )
-    return render_template( 'batch_results.html', plots=plots )
-  else:
-    return render_template( 'batch.html' )
-
+# URLs 
 @app.route( '/', methods=['GET', 'POST'] )
 def simple():
   if request.method == 'POST':
@@ -71,7 +42,7 @@ def simple():
     # turn into pandas df
     df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
 
-    # these are bglb-assay--specific
+    # map the form values to the DataFrame 
     samplemap = { str(i+1): request.form.get( 'mut{}-name'.format( (i/3)+1 ) ) for i in range(12) }
     yieldmap = { str(i+1): request.form.get( 'mut{}-yield'.format( (i/3)+1 ) ) for i in range(12) }
     dilutionmap = { str(i+1): request.form.get( 'mut{}-dilution'.format( (i/3)+1 ) ) for i in range(12) }
@@ -94,23 +65,30 @@ def simple():
 
     # iterate over 4 samples by name, in entered order (see sort=False above)
     for name, df in grouped:
-      notes = []
+
       conc = '{0:.2f}'.format( df['yield'].mean() )
+      popt, perr = do_fit( df )
+
+      # make notes of possible errors 
+      notes = []
       if float( conc ) < 0.2:
           notes.append( 'Protein yield is below 0.2 mg/mL' )
-      # this seems hacky, what if the sample names overlap?
-      popt, perr = do_fit( df )
+
       if perr[0] > 25:
           notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
       if perr[1] > 25:
           notes.append( 'K<sub>M</sub> error is greater than 25%' )
+
+      # set up plot 
       fig, ax = plt.subplots( figsize=(3,3) )
       ax.scatter( df.s, df.kobs, color='cornflowerblue', alpha=0.9, marker='.' )
       xvals = linspace( df.s.min(), df.s.max(), 100 )
 
+      # check for MM params 
       if popt[0] > 1:
         ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
 
+      # finish up plots 
       ax.set_title( name )
       ax.set_xlabel( '[pNPG] (M)' )
       ax.set_ylabel( 'Rate (min$^{-1}$)' )
