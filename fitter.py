@@ -12,7 +12,7 @@ from StringIO import StringIO
 from flask import Flask, request, render_template
 
 app = Flask( __name__ )
-app.debug = True 
+app.debug = True
 
 def kobs( s, kcat, km ):
   return (kcat*s)/(km+s)
@@ -32,7 +32,7 @@ s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
 smap = dict( zip( 'ABCDEFGH', s ) )
 extcoef = 113000
 
-# URLs 
+# URLs
 @app.route( '/', methods=['GET', 'POST'] )
 def simple():
   if request.method == 'POST':
@@ -42,7 +42,7 @@ def simple():
     # turn into pandas df
     df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
 
-    # map the form values to the DataFrame 
+    # map the form values to the DataFrame
     samplemap = { str(i+1): request.form.get( 'mut{}-name'.format( (i/3)+1 ) ) for i in range(12) }
     yieldmap = { str(i+1): request.form.get( 'mut{}-yield'.format( (i/3)+1 ) ) for i in range(12) }
     dilutionmap = { str(i+1): request.form.get( 'mut{}-dilution'.format( (i/3)+1 ) ) for i in range(12) }
@@ -67,9 +67,10 @@ def simple():
     for name, df in grouped:
 
       conc = '{0:.2f}'.format( df['yield'].mean() )
+      dilution = df['dilution'].mean()
       popt, perr = do_fit( df )
 
-      # make notes of possible errors 
+      # make notes of possible errors
       notes = []
       if float( conc ) < 0.2:
           notes.append( 'Protein yield is below 0.2 mg/mL' )
@@ -79,16 +80,16 @@ def simple():
       if perr[1] > 25:
           notes.append( 'K<sub>M</sub> error is greater than 25%' )
 
-      # set up plot 
+      # set up plot
       fig, ax = plt.subplots( figsize=(3,3) )
       ax.scatter( df.s, df.kobs, color='cornflowerblue', alpha=0.9, marker='.' )
       xvals = linspace( df.s.min(), df.s.max(), 100 )
 
-      # check for MM params 
+      # check for MM params
       if popt[0] > 1:
         ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
 
-      # finish up plots 
+      # finish up plots
       ax.set_title( name )
       ax.set_xlabel( '[pNPG] (M)' )
       ax.set_ylabel( 'Rate (min$^{-1}$)' )
@@ -104,7 +105,7 @@ def simple():
       img.seek( 0 )
 
       # collect everything
-      samples.append( ( name, conc, popt, perr, img.read(), notes ) )
+      samples.append( ( name, conc, dilution, popt, perr, img.read(), notes ) )
 
     return render_template( 'results.html', samples=samples )
 

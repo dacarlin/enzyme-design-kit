@@ -8,11 +8,11 @@
 <div class="container">
   <div style="margin-top:1.8em"></div>
   <div class="row">
-    {% for name, conc, popt, perr, plot, notes in samples %}
+    {% for name, conc, dilution, popt, perr, plot, notes in samples %}
     <div class="col-sm-6 col-md-3">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">{{name}}</h3>
+          <h1 class="panel-title">{{name}}</h1>
         </div>
         <div class="panel-body">
           <img src="data:image/svg+xml;utf8,{{plot}}" alt="...">
@@ -21,17 +21,40 @@
           {% endfor %}
             <!-- <p><a href="#" class="btn btn-primary" role="button">Download</a> <a href="#" class="btn" role="button">Discard</a></p> -->
           </div>
+          <div class="panel-heading">
+            <h5>User parameters</h5>
+          </div>
           <table class="table">
             <thead>
               <tr>
-                <th>Yeild</th>
-                <th><em>k</em><sub>cat</sub></th>
-                <th>K<sub>M</sub></th>
+                <th>Protein yeild</th>
+                <th>Dilution</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>{{conc}}</td>
+                <td>{{conc}} mg/mL</td>
+                <td>{{dilution}}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="panel-heading">
+            <h5>Estimated kinetic parameters</h5>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th><em>k</em><sub>cat</sub></th>
+                <th>K<sub>M</sub></th>
+              </tr>
+              <tr>
+                <td>min<sup>&ndash;1</sup></td>
+                <td>mM</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
                 <td>{{popt[0]|round(1)}}&nbsp;±&nbsp;{{perr[0]|round(1)}}%</td>
                 <td>{{(popt[1]*1000)|round(1)}}&nbsp;±&nbsp;{{perr[1]|round(1)}}%</td>
               </tr>
@@ -48,7 +71,7 @@
     <div class="col-md-6">
       <h3>Results as CSV</h3>
         <pre>sample,protein_yield,kcat,percent_err_kcat,km,percent_err_km
-{% for name, conc, popt, perr, plot, notes in samples -%}
+{% for name, conc, dilution, popt, perr, plot, notes in samples -%}
 {{name}},{{conc}},{{popt[0]|round(1)}},{{perr[0]|round(1)}}%,{{(popt[1]*1000)|round(2)}},{{perr[1]|round(1)}}%{{'\n'}}
 {%- endfor %}</pre>
     </div>
