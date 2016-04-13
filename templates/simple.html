@@ -27,10 +27,10 @@
           <tr class="mutant-row">
           {% for i in range( 4 ) %}
             <td>Columns {{(i+1)*3-2}}&ndash;{{(i+1)*3}}</td>
-            <td><input type="text" name="mut{{i}}-name" size=5 maxlength=5 required></td>
-            <td><input type="text" name="mut{{i}}-yield" size=4 maxlength=4 required></td>
+            <td><input type="text" name="mut{{i+1}}-name" size=5 maxlength=5 required></td>
+            <td><input type="text" name="mut{{i+1}}-yield" size=4 maxlength=4 required></td>
             <td>
-              <select name="mut{{i}}-dilution" required>
+              <select name="mut{{i+1}}-dilution" required>
                 <option value=""></option>
                 <option value="0.01">100-fold</option>
                 <option value="0.1">10-fold</option>
