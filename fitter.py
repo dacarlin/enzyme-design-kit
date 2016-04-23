@@ -1,7 +1,7 @@
 import pandas
 import datetime
 
-from numpy import diag, sqrt, linspace
+from numpy import diag, sqrt, linspace, array, nan 
 from scipy.optimize import curve_fit
 
 from matplotlib import use; use( 'Agg' )
@@ -25,7 +25,7 @@ def do_fit( df ):
     return popt, perr
   except Exception as e:
     print e
-    return [], []
+    return array( [] ), array( [] ) 
 
 # BglB-specific values below!
 s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
@@ -66,28 +66,33 @@ def simple():
     # iterate over 4 samples by name, in entered order (see sort=False above)
     for name, df in grouped:
 
+      # collect metadata 
       conc = '{0:.2f}'.format( df['yield'].mean() )
       dilution = df['dilution'].mean()
       popt, perr = do_fit( df )
-
-      # make notes of possible errors
-      notes = []
-      if float( conc ) < 0.2:
-          notes.append( 'Protein yield is below 0.2 mg/mL' )
-
-      if perr[0] > 25:
-          notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
-      if perr[1] > 25:
-          notes.append( 'K<sub>M</sub> error is greater than 25%' )
+      print len( popt), len( perr ) 
 
       # set up plot
       fig, ax = plt.subplots( figsize=(3,3) )
       ax.scatter( df.s, df.kobs, color='cornflowerblue', alpha=0.9, marker='.' )
       xvals = linspace( df.s.min(), df.s.max(), 100 )
 
-      # check for MM params
-      if popt[0] > 1:
-        ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
+      # make notes of possible errors
+      notes = []
+      if float( conc ) < 0.2:
+          notes.append( 'Protein yield is below 0.2 mg/mL' )
+      
+      # check if we have a fit 
+      if popt.size == 2 and perr.size == 2:
+        if perr[0] > 25:
+            notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
+        if perr[1] > 25:
+            notes.append( 'K<sub>M</sub> error is greater than 25%' )
+        if popt[0] > 0.05:
+          ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
+      else:
+        popt = perr = array( [ nan, nan ] ) 
+        notes.append( 'There was an error fitting data for {} to the Michaelis-Menten equation'.format( name ) )  
 
       # finish up plots
       ax.set_title( name )
