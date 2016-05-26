@@ -57,7 +57,7 @@ def simple():
     df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
 
     # save this data set
-    #df.to_csv( '/saved_runs/submitted_{}.csv'.format( datetime.datetime.now() ) )
+    #df.to_csv( '/uploads/submitted_{}.csv'.format( datetime.datetime.now() ) )
 
     # group df by sample
     grouped = df.groupby( 'sample', sort=False )
@@ -74,7 +74,7 @@ def simple():
 
       # set up plot
       fig, ax = plt.subplots( figsize=(3,3) )
-      ax.scatter( df.s, df.kobs, color='cornflowerblue', alpha=0.9, marker='.' )
+      ax.scatter( df.s, df.kobs, color='cornflowerblue', marker='.' )
       xvals = linspace( df.s.min(), df.s.max(), 100 )
 
       # make notes of possible errors
