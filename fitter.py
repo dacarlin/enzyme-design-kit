@@ -1,7 +1,7 @@
 import pandas
 import datetime
 
-from numpy import diag, sqrt, linspace, array, nan 
+from numpy import diag, sqrt, linspace, array, nan, empty
 from scipy.optimize import curve_fit
 
 from matplotlib import use; use( 'Agg' )
@@ -17,15 +17,30 @@ app.debug = True
 def kobs( s, kcat, km ):
   return (kcat*s)/(km+s)
 
+# http://www1.lsbu.ac.uk/water/enztech/inhibition.html
+def kobs_with_substrate_inhibition( s, kcat, km, ks ):
+    return (kcat*s)/(km+s*(1+(s/ks)))
+
+def do_substrate_inhibition_fit( df ):
+    try:
+        p0 = ( df.kobs.max(), df.s.mean(), 0.04 )
+        popt, pcov = curve_fit( kobs_with_substrate_inhibition, df.s, df.kobs, p0=p0 )
+        perr = sqrt( diag( pcov ) ) / popt * 100
+        return { 'popt': popt, 'perr': perr }
+    except Exception as e:
+        print e
+        return { 'popt': empty([1,3]), 'perr': empty([1,3]) }
+
 def do_fit( df ):
-  try:
-    p0 = ( df.kobs.max(), df.s.mean() )
-    popt, pcov = curve_fit( kobs, df.s, df.kobs, p0=p0 )
-    perr = sqrt( diag( pcov ) ) / popt * 100
-    return popt, perr
-  except Exception as e:
-    print e
-    return array( [] ), array( [] ) 
+    try:
+        p0 = ( df.kobs.max(), df.s.mean() )
+        popt, pcov = curve_fit( kobs, df.s, df.kobs, p0=p0 )
+        perr = sqrt( diag( pcov ) ) / popt * 100
+        inhibition = do_substrate_inhibition_fit( df )
+        return popt, perr, inhibition
+    except Exception as e:
+        print e
+        return array( [] ), array( [] ), inhibition
 
 # BglB-specific values below!
 s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
@@ -66,11 +81,10 @@ def simple():
     # iterate over 4 samples by name, in entered order (see sort=False above)
     for name, df in grouped:
 
-      # collect metadata 
+      # collect metadata
       conc = '{0:.2f}'.format( df['yield'].mean() )
       dilution = df['dilution'].mean()
-      popt, perr = do_fit( df )
-      print len( popt), len( perr ) 
+      popt, perr, inhibition = do_fit( df )
 
       # set up plot
       fig, ax = plt.subplots( figsize=(3,3) )
@@ -81,8 +95,8 @@ def simple():
       notes = []
       if float( conc ) < 0.2:
           notes.append( 'Protein yield is below 0.2 mg/mL' )
-      
-      # check if we have a fit 
+
+      # check if we have a fit
       if popt.size == 2 and perr.size == 2:
         if perr[0] > 25:
             notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
@@ -91,8 +105,8 @@ def simple():
         if popt[0] > 0.05:
           ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
       else:
-        popt = perr = array( [ nan, nan ] ) 
-        notes.append( 'There was an error fitting data for {} to the Michaelis-Menten equation'.format( name ) )  
+        popt = perr = array( [ nan, nan ] )
+        notes.append( 'There was an error fitting data for {} to the Michaelis-Menten equation'.format( name ) )
 
       # finish up plots
       ax.set_title( name )
@@ -102,6 +116,17 @@ def simple():
       yticks = ax.get_yticks()
       ax.set_yticks( yticks[1:-1] )
       plt.tight_layout()
+
+      # debugging! adding a line to 4th example plot
+      if inhibition['popt'].all():
+          ks = inhibition['popt'][2]
+          print 'ks:', ks
+          if popt[1] < ks < 0.5:
+
+              plt.plot( xvals, kobs_with_substrate_inhibition( xvals, * inhibition['popt'] ), color='g', alpha='.7' )
+              plt.plot( [ ks, ks ], [ ks, df.kobs.max() ], 'k--', alpha=0.4 )
+
+              #plt.legend( ['substrate inhibition'], loc='lower right' )
 
       # encode plot as a string
       img = StringIO()
