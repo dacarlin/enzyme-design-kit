@@ -98,18 +98,6 @@ def simple():
       if float( conc ) < 0.2:
           notes.append( 'Protein yield is below 0.2 mg/mL' )
 
-      # check if we have a fit
-      if popt.size == 2 and perr.size == 2:
-        if perr[0] > 25:
-            notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
-        if perr[1] > 25:
-            notes.append( 'K<sub>M</sub> error is greater than 25%' )
-        if popt[0] > 0.05:
-          ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
-      else:
-        popt = perr = array( [ nan, nan ] )
-        notes.append( 'There was an error fitting data for {} to the Michaelis-Menten equation'.format( name ) )
-
       # finish up plots
       ax.set_title( name )
       ax.set_xlabel( '[pNPG] (M)' )
@@ -119,11 +107,22 @@ def simple():
       ax.set_yticks( yticks[1:-1] )
       plt.tight_layout()
 
-      # debugging! adding a line to 4th example plot
-      print popt_si.size, perr_si.size
+      # check if we have evidence of substrate inhibition
       if popt_si.size == 3 and perr_si.size == 3:
-          plt.plot( xvals, kobs_with_substrate_inhibition( xvals, *popt_si ), color='g', alpha='.7' )
-          #plt.plot( [ ks, ks ], [ ks, df.kobs.max() ], 'k--', alpha=0.4 )
+          if perr_si[2] < 100 * 100:
+                ax.plot( xvals, kobs_with_substrate_inhibition( xvals, *popt_si ), color='g', alpha='.7' )
+          else:
+                # check if we have a MM fit
+                if popt.size == 2 and perr.size == 2:
+                  if perr[0] > 25:
+                      notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
+                  if perr[1] > 25:
+                      notes.append( 'K<sub>M</sub> error is greater than 25%' )
+                  if popt[0] > 0.05:
+                    ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
+                else:
+                  popt = perr = array( [ nan, nan ] )
+                  notes.append( 'There was an error fitting data for {} to the Michaelis-Menten equation'.format( name ) )
 
       # encode plot as a string
       img = StringIO()
@@ -132,7 +131,7 @@ def simple():
       img.seek( 0 )
 
       # collect everything
-      samples.append( ( name, conc, dilution, popt, perr, img.read(), notes ) )
+      samples.append( ( name, conc, dilution, popt, perr, popt_si, perr_si, img.read(), notes ) )
 
     return render_template( 'results.html', samples=samples )
 
