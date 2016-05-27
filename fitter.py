@@ -26,10 +26,11 @@ def do_substrate_inhibition_fit( df ):
         p0 = ( df.kobs.max(), df.s.mean(), 0.04 )
         popt, pcov = curve_fit( kobs_with_substrate_inhibition, df.s, df.kobs, p0=p0 )
         perr = sqrt( diag( pcov ) ) / popt * 100
-        return { 'popt': popt, 'perr': perr }
+        return popt, perr
     except Exception as e:
         print e
-        return { 'popt': empty([1,3]), 'perr': empty([1,3]) }
+        empty3 = array( [nan, nan, nan] )
+        return empty3, empty3
 
 def do_fit( df ):
     try:
@@ -37,10 +38,10 @@ def do_fit( df ):
         popt, pcov = curve_fit( kobs, df.s, df.kobs, p0=p0 )
         perr = sqrt( diag( pcov ) ) / popt * 100
         inhibition = do_substrate_inhibition_fit( df )
-        return popt, perr, inhibition
+        return popt, perr
     except Exception as e:
         print e
-        return array( [] ), array( [] ), inhibition
+        return array( [] ), array( [] )
 
 # BglB-specific values below!
 s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
@@ -84,7 +85,8 @@ def simple():
       # collect metadata
       conc = '{0:.2f}'.format( df['yield'].mean() )
       dilution = df['dilution'].mean()
-      popt, perr, inhibition = do_fit( df )
+      popt, perr = do_fit( df )
+      popt_si, perr_si = do_substrate_inhibition_fit( df )
 
       # set up plot
       fig, ax = plt.subplots( figsize=(3,3) )
@@ -118,15 +120,10 @@ def simple():
       plt.tight_layout()
 
       # debugging! adding a line to 4th example plot
-      if inhibition['popt'].all():
-          ks = inhibition['popt'][2]
-          print 'ks:', ks
-          if popt[1] < ks < 0.5:
-
-              plt.plot( xvals, kobs_with_substrate_inhibition( xvals, * inhibition['popt'] ), color='g', alpha='.7' )
-              plt.plot( [ ks, ks ], [ ks, df.kobs.max() ], 'k--', alpha=0.4 )
-
-              #plt.legend( ['substrate inhibition'], loc='lower right' )
+      print popt_si.size, perr_si.size
+      if popt_si.size == 3 and perr_si.size == 3:
+          plt.plot( xvals, kobs_with_substrate_inhibition( xvals, *popt_si ), color='g', alpha='.7' )
+          #plt.plot( [ ks, ks ], [ ks, df.kobs.max() ], 'k--', alpha=0.4 )
 
       # encode plot as a string
       img = StringIO()
