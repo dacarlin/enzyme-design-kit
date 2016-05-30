@@ -3,7 +3,6 @@
 {% block head %}
     {{ super() }}
 {% endblock %}
-
 {% block content %}
 <div class="container">
   <div style="margin-top:1.8em"></div>
@@ -15,15 +14,6 @@
           <h1 class="panel-title">{{name}}</h1>
         </div>
         <div class="panel-body">
-          <img src="data:image/svg+xml;utf8,{{plot}}" alt="...">
-          {% for note in notes %}
-            <div class="alert alert-warning" role="alert"><small><b>WARNING</b></small> {{note|safe}}</div>
-          {% endfor %}
-            <!-- <p><a href="#" class="btn btn-primary" role="button">Download</a> <a href="#" class="btn" role="button">Discard</a></p> -->
-          </div>
-          <div class="panel-heading">
-            <h5>User parameters</h5>
-          </div>
           <table class="table">
             <thead>
               <tr>
@@ -38,68 +28,63 @@
               </tr>
             </tbody>
           </table>
-
-          <div class="panel-heading">
-            <h5>Estimated kinetic parameters for Michaelis-Menten fit</h5>
-          </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th><em>k</em><sub>cat</sub></th>
-                <th>K<sub>M</sub></th>
-              </tr>
-              <tr>
-                <td>min<sup>&ndash;1</sup></td>
-                <td>mM</td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{popt[0]|round(1)}}&nbsp;±&nbsp;{{perr[0]|round(1)}}%</td>
-                <td>{{(popt[1]*1000)|round(1)}}&nbsp;±&nbsp;{{perr[1]|round(1)}}%</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="panel-heading">
-            <h5>Estimated kinetic parameters for Michaelis-Menten with substrate inhibition fit</h5>
-          </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th><em>k</em><sub>cat</sub></th>
-                <th>K<sub>M</sub></th>
-                <th>K<sub>S</sub></th>
-              </tr>
-              <tr>
-                <td>min<sup>&ndash;1</sup></td>
-                <td>mM</td>
-                <td>mM</td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{popt_si[0]|round(1)}}&nbsp;±&nbsp;{{perr_si[0]|round(1)}}%</td>
-                <td>{{(popt_si[1]*1000)|round(1)}}&nbsp;±&nbsp;{{perr_si[1]|round(1)}}%</td>
-                <td>{{(popt_si[2]*1000)|round(1)}}&nbsp;±&nbsp;{{perr_si[2]|round(1)}}%</td>
-              </tr>
-            </tbody>
-          </table>
-
+          {% for note in notes %}
+            <div class="alert alert-warning" role="alert">{{note|safe}}</div>
+          {% endfor %}
+          <img src="data:image/svg+xml;utf8,{{plot}}" alt="...">
         </div>
-      </div>
-    {% endfor %}
-  </div>
 
-<!-- csv -->
-  <div class="row">
-    <div class="col-md-6">
-      <h3>Results as CSV</h3>
-        <pre>sample,protein_yield,kcat,percent_err_kcat,km,percent_err_km
-{% for name, conc, dilution, popt, perr, popt_si, perr_si, plot, notes in samples %}
-{{name}},{{conc}},{{popt[0]|round(1)}},{{perr[0]|round(1)}}%,{{(popt[1]*1000)|round(2)}},{{perr[1]|round(1)}}%{{'\n'}}
-{%- endfor %}</pre>
-    </div>
-  </div>
-</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th><em>k</em><sub>cat</sub></th>
+              <th>K<sub>M</sub></th>
+            </tr>
+            <tr>
+              <td>min<sup>&ndash;1</sup></td>
+              <td>mM</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{popt[0]|round(1)}}&nbsp;±&nbsp;{{perr[0]|round(1)}}%</td>
+              <td>{{(popt[1]*1000)|round(1)}}&nbsp;±&nbsp;{{perr[1]|round(1)}}%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="panel-body">
+          <p>Substrate inhibition:</p>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th><em>k</em><sub>cat</sub></th>
+              <th>K<sub>M</sub></th>
+              <th>K<sub>S</sub></th>
+            </tr>
+            <tr>
+              <td>min<sup>&ndash;1</sup></td>
+              <td>mM</td>
+              <td>mM</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{popt_si[0]|round(1)}}&nbsp;±&nbsp;{{perr_si[0]|round(1)}}%</td>
+              <td>{{(popt_si[1]*1000)|round(1)}}&nbsp;±&nbsp;{{perr_si[1]|round(1)}}%</td>
+              <td>{{(popt_si[2]*1000)|round(1)}}&nbsp;±&nbsp;{{perr_si[2]|round(1)}}%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="panel-body" style="text-align:center;">
+          <p><a href="#" class="btn btn-primary" role="button">Download</a> <a href="#" class="btn" role="button">Discard</a></p>
+        </div>
+      </div> <!-- closes the panel -->
+    </div> <!-- closes the column we're in -->
+    {% endfor %}
+  </div> <!-- closes the row -->
+</div> <!-- closes the container -->
 {% endblock %}
