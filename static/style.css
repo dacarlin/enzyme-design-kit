@@ -1,0 +1,33 @@
+/* header */
+#header {
+  height: 50px;
+  border-bottom: 1px solid #eee;
+  /*border-top: 6px solid #eee;*/
+  text-align: center;
+}
+
+#header a, #header b {
+  line-height: 50px;
+  padding: 0 20px;
+}
+
+/* hide the example form */
+.example div {
+  display: none;
+}
+
+/* phat form */
+form {
+  padding: 20px;
+  font-size: 17px;
+}
+
+table.mutant-table tr td {
+  padding: 0 1em 1em 0;
+}
+
+/**/
+
+img {
+  width: 100%;
+}
