@@ -70,7 +70,7 @@ def simple():
         df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
 
         # save this data set
-        #df.to_csv( '/uploads/submitted_{}.csv'.format( datetime.datetime.now() ) )
+        df.to_csv( '/data/bagel/uploads/submitted_{}.csv'.format( datetime.datetime.now() ) )
 
         # group df by sample
         grouped = df.groupby( 'sample', sort=False )
@@ -111,7 +111,7 @@ def simple():
                     if perr[1] > 25:
                         notes.append( 'K<sub>M</sub> error is greater than 25%' )
                     if popt[0] > 0.05:
-                        ax.plot( xvals, kobs_with_substrate_inhibition( xvals, *popt_si ), color='g', alpha='.7' )
+                        ax.plot( xvals, kobs_with_substrate_inhibition( xvals, *popt_si ), color='g', alpha=.7 )
                 else:
                     # check if we have a MM fit
                     if popt.size == 2 and perr.size == 2:
