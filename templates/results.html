@@ -34,6 +34,11 @@
           <img src="data:image/svg+xml;utf8,{{plot}}" alt="...">
         </div>
 
+        <div class="panel-body">
+          <p>Michaelis-Menten</p>
+        </div>
+
+
         <table class="table">
           <thead>
             <tr>
@@ -54,7 +59,7 @@
         </table>
 
         <div class="panel-body">
-          <p>Substrate inhibition:</p>
+          <p>Michaelis-Menten with substrate inhibition</p>
         </div>
 
         <table class="table">
@@ -79,12 +84,34 @@
           </tbody>
         </table>
 
-        <div class="panel-body" style="text-align:center;">
+        <!-- <div class="panel-body" style="text-align:center;">
           <p><a href="#" class="btn btn-primary" role="button">Download</a> <a href="#" class="btn" role="button">Discard</a></p>
-        </div>
+        </div> -->
       </div> <!-- closes the panel -->
     </div> <!-- closes the column we're in -->
     {% endfor %}
   </div> <!-- closes the row -->
+
+  <div class="row">
+
+    <div class="col-12">
+      <h3>Report materials</h3>
+    </div>
+
+    <div class="col-md-6">
+
+      <h3>Assay data</h3>
+
+      <pre>
+        {{dat.to_string(index=False)}}
+      </pre>
+    </div>
+
+    <div class="col-md-6">
+      <button class="btn">Download report</button>
+    </div>
+
+  </div> <!-- closes the row -->
+
 </div> <!-- closes the container -->
 {% endblock %}

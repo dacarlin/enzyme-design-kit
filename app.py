@@ -70,24 +70,24 @@ def simple():
         df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
 
         # save this data set
-        df.to_csv( '/data/bagel/uploads/submitted_{}.csv'.format( datetime.datetime.now() ) )
+        #df.to_csv( '/data/bagel/uploads/submitted_{}.csv'.format( datetime.datetime.now() ) )
 
         # group df by sample
         grouped = df.groupby( 'sample', sort=False )
         samples = [ ]
 
         # iterate over 4 samples by name, in entered order (see sort=False above)
-        for name, df in grouped:
+        for name, my_df in grouped:
 
             # collect metadata
-            conc = '{0:.2f}'.format( df['yield'].mean() )
-            dilution = df['dilution'].mean()
-            popt, perr = do_fit( df )
-            popt_si, perr_si = do_substrate_inhibition_fit( df )
+            conc = '{0:.2f}'.format( my_df['yield'].mean() )
+            dilution = my_df['dilution'].mean()
+            popt, perr = do_fit( my_df )
+            popt_si, perr_si = do_substrate_inhibition_fit( my_df )
 
             # set up plot
             fig, ax = plt.subplots( figsize=(3,3) )
-            ax.scatter( df.s, df.kobs, color='k', marker='.' )
+            ax.scatter( my_df.s, my_df.kobs, color='k', marker='.' )
             ax.set_title( name )
             ax.set_xlabel( '[pNPG] (M)' )
             ax.set_ylabel( 'Rate (min$^{-1}$)' )
@@ -96,7 +96,7 @@ def simple():
             ax.set_yticks( yticks[1:-1] )
             plt.tight_layout()
 
-            xvals = linspace( df.s.min(), df.s.max(), 100 )
+            xvals = linspace( my_df.s.min(), my_df.s.max(), 100 )
 
             # make notes of possible errors
             notes = []
@@ -137,10 +137,10 @@ def simple():
                 name, conc, dilution, popt, perr, popt_si, perr_si, img.read(), notes
             ) )
 
-        return render_template( 'results.html', samples=samples )
+        return render_template( 'results.html', samples=samples, dat=df )
 
     else:
-        # not a POST request, is GET request
+        # not a POST request
         return render_template( 'plate.html' )
 
 # init Flask app if run as `python app.py`
