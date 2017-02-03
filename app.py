@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pandas
 import datetime
 from numpy import diag, sqrt, linspace, array, nan, empty
