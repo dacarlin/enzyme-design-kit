@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Thermal stability{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="main col-md-6">
+      <form action="" method=post>
+        <label for="mutant-table">Fit thermal stability data to logistic equation</label>
+        <table class="mutant-table">
+          <tr class="entry-form-head">
+            <td></td>
+            <td><b>Mutant name</b><br><em>e.g.</em>, W120F</td>
+          </tr>
+          <tr class="mutant-row">
+          {% for i in range( 4 ) %}
+            <td>Columns&nbsp;{{(i+1)*3-2}}&ndash;{{(i+1)*3}}</td>
+            <td><input type="text" name="mut{{i+1}}-name" size=5 maxlength=5 required></td>
+          </tr>
+          {% endfor %}
+        </table>
+        <label for="data">Paste data from thermal stability assay</label>
+        <textarea name="data" cols=60 rows=3 ></textarea>
+        <button class="btn btn-primary submit-button" type="submit">Submit</button>
+      </form>
+
+      <div class="example">
+        <form action="" method=post>
+          <div>
+            <td><input type="text" name="mut1-name" value="X12Y" required></td>
+            <td><input type="text" name="mut2-name" value="X123A" required></td>
+            <td><input type="text" name="mut3-name" value="Z78X" required></td>
+            <td><input type="text" name="mut4-name" value="X1X" required></td>
+            <textarea name="data">
+Well	Max V [420]
+A1	2.9100000000000003e-05
+B1	4.44e-05
+C1	0.00047599999999999997
+D1	0.0114
+E1	0.069
+F1	0.0814
+G1	0.0788
+H1	0.0812
+A2	3.2500000000000004e-05
+B2	7.28e-05
+C2	0.000487
+D2	0.0124
+E2	0.0636
+F2	0.0717
+G2	0.0714
+H2	0.0798
+A3	3.5600000000000005e-05
+B3	3.9500000000000005e-05
+C3	0.000539
+D3	0.0141
+E3	0.0634
+F3	0.0718
+G3	0.074
+H3	0.0758
+A4	5.2000000000000004e-05
+B4	3.39e-05
+C4	0.000113
+D4	0.00504
+E4	0.0116
+F4	0.0124
+G4	0.013
+H4	0.0142
+A5	5.6000000000000006e-05
+B5	2.8300000000000003e-05
+C5	6.8e-05
+D5	0.00485
+E5	0.0116
+F5	0.0121
+G5	0.0132
+H5	0.0053
+A6	3.74e-05
+B6	3.0799999999999996e-05
+C6	9.499999999999999e-05
+D6	0.0044399999999999995
+E6	0.0113
+F6	0.0125
+G6	0.0134
+H6	0.0064
+A7	3.45e-05
+B7	-2.36e-05
+C7	-2.97e-05
+D7	0.000125
+E7	0.000408
+F7	0.000579
+G7	0.000572
+H7	0.000633
+A8	7.58e-05
+B8	3.3299999999999996e-05
+C8	2.24e-05
+D8	0.000149
+E8	0.00048499999999999997
+F8	0.0005769999999999999
+G8	0.000588
+H8	0.000604
+A9	2.7899999999999997e-05
+B9	2.42e-05
+C9	2.55e-05
+D9	0.000152
+E9	0.000521
+F9	0.000559
+G9	0.000579
+H9	0.000596
+A10	2.2899999999999998e-05
+B10	2.1600000000000003e-05
+C10	8.42e-06
+D10	0.000194
+E10	0.000487
+F10	0.000539
+G10	0.000602
+H10	0.00047400000000000003
+A11	1.65e-05
+B11	1.66e-05
+C11	1.21e-05
+D11	0.000162
+E11	0.0005139999999999999
+F11	4.91e-05
+G11	0.000583
+H11	0.000732
+A12	3.0799999999999996e-05
+B12	3.12e-05
+C12	-1.6100000000000002e-05
+D12	0.000153
+E12	0.00045999999999999996
+F12	0.0005679999999999999
+G12	0.000583
+H12	0.000675
+              </textarea>
+            </div>
+          <button class="btn submit-button" type="submit">Run the example</button>
+        </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

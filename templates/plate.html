@@ -12,14 +12,7 @@
     <div class="col-md-3"></div>
     <div class="main col-md-6">
       <form action="" method=post>
-        <h1 class="page-header">Analyze a plate</h1>
-        <p>
-          <a href="https://github.com/dacarlin/bagel-protocol/blob/master/production.md">
-            &larr; Back to protocol
-          </a>
-        </p>
-        <p class="lead">
-        </p>
+        <label for="mutant-table">Fit kinetic data to Michaelis-Menten equation</label>
         <table class="mutant-table">
           <tr class="entry-form-head">
             <td></td>
@@ -43,7 +36,7 @@
           {% endfor %}
         </table>
 
-        <label for="data">Paste data from the "Statistics" tab in Gen5:</label>
+        <label for="data">Paste kinetic data from the "Statistics" tab in Gen5</label>
         <textarea name="data" cols=60 rows=3 ></textarea>
 
         <p class="lead">
@@ -55,19 +48,19 @@
       <div class="example">
         <form action="" method=post>
           <div>
-                  <td><input type="text" name="mut1-name" value="WT" required></td>
-                  <td><input type="text" name="mut1-yield" value="0.85" required></td>
-                  <td><select name="mut1-dilution"><option value="0.01">100-fold</option><option value="0.1">10-fold</option></select></td>
-                  <td><input type="text" name="mut2-name" value="E164A" required></td>
-                  <td><input type="text" name="mut2-yield" value=".25" required></td>
-                  <td><select name="mut2-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
-                  <td><input type="text" name="mut3-name" value="E123F" required></td>
-                  <td><input type="text" name="mut3-yield" value="1.3" required></td>
-                  <td><select name="mut3-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
-                  <td><input type="text" name="mut4-name" value="G456H" required></td>
-                  <td><input type="text" name="mut4-yield" value="1.4" required></td>
-                  <td><select name="mut4-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
-                  <textarea name="data">
+            <td><input type="text" name="mut1-name" value="WT" required></td>
+            <td><input type="text" name="mut1-yield" value="0.85" required></td>
+            <td><select name="mut1-dilution"><option value="0.01">100-fold</option><option value="0.1">10-fold</option></select></td>
+            <td><input type="text" name="mut2-name" value="E164A" required></td>
+            <td><input type="text" name="mut2-yield" value=".25" required></td>
+            <td><select name="mut2-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
+            <td><input type="text" name="mut3-name" value="E123F" required></td>
+            <td><input type="text" name="mut3-yield" value="1.3" required></td>
+            <td><select name="mut3-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
+            <td><input type="text" name="mut4-name" value="G456H" required></td>
+            <td><input type="text" name="mut4-yield" value="1.4" required></td>
+            <td><select name="mut4-dilution"><option value="0.1">10-fold</option><option value="0.01">100-fold</option></select></td>
+            <textarea name="data">
 Well	Max V [420]
 A1	1.6721880E-02
 B1	1.0095556E-01

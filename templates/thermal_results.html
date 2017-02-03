@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Thermal stability results{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div style="margin-top:1.8em"></div>
+  <div class="row">
+    {% for name, params, errors, plot in result %}
+    <div class="col-sm-6 col-md-3">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h1 class="panel-title">{{name}}</h1>
+        </div>
+        <div class="panel-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>T<sub>m</sub> (˚C)</th>
+                <th><em>k</em></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ '%2.2f' % params[0] }} ± {{ '%2.2f' % errors[0] }}</td>
+                <td>{{ '%2.2f' % params[1] }} ± {{ '%2.2f' % errors[1] }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <img src="data:image/svg+xml;utf8,{{plot}}" alt="...">
+        </div>
+      </div> <!-- closes the panel -->
+    </div> <!-- closes the column we're in -->
+    {% endfor %}
+  </div> <!-- closes the row -->
+</div> <!-- closes the container -->
+{% endblock %}

@@ -2,12 +2,13 @@ import pandas
 import datetime
 
 from numpy import diag, sqrt, linspace, array, nan, empty
+import numpy as np
 from scipy.optimize import curve_fit
 
 from matplotlib import use; use( 'Agg' )
 import matplotlib.pyplot as plt
 
-from StringIO import StringIO
+from io import StringIO
 
 from flask import Flask, request, render_template
 
@@ -20,6 +21,21 @@ def kobs( s, kcat, km ):
 def kobs_with_substrate_inhibition( s, kcat, km, ks ):
     return (kcat*s)/(km+s*(1+(s/ks)))
 
+def r( x, x0, k ):
+    return 1 / ( 1 + np.exp( -k * ( x - x0 ) ) )
+
+def my_curve_fit( f, xdata, ydata, p0 ):
+    null_return = [ [ np.nan ] * len(p0) ] * 2
+    try:
+        curve_return = curve_fit( f, xdata, ydata, p0 )
+        if len( curve_return ) == 2:
+            errors = np.sqrt( np.diag( curve_return[1] ) )
+            return curve_return[0], errors
+        else:
+            return null_return
+    except:
+        return null_return
+
 def do_substrate_inhibition_fit( df ):
     try:
         p0 = ( df.kobs.max(), df.s.mean(), 0.04 )
@@ -27,7 +43,7 @@ def do_substrate_inhibition_fit( df ):
         perr = sqrt( diag( pcov ) ) / popt * 100
         return popt, perr
     except Exception as e:
-        print e
+        #print( e )
         empty3 = array( [nan, nan, nan] )
         return empty3, empty3
 
@@ -38,7 +54,7 @@ def do_fit( df ):
         perr = sqrt( diag( pcov ) ) / popt * 100
         return popt, perr
     except Exception as e:
-        print e
+        #print( e )
         return array( [] ), array( [] )
 
 # BglB-specific values below!
@@ -50,15 +66,15 @@ def simple():
     if request.method == 'POST':
 
         # read in form
-        clean_dat = request.form.get( 'data' ).replace('Max V [420]', 'rate').replace(' ', '\n').lower()
+        clean_dat = request.form[ 'data' ].replace('Max V [420]', 'rate').replace(' ', '\n').lower()
 
         # turn into pandas df
         df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
 
         # map the form values to the DataFrame
-        samplemap = { str(i+1): request.form.get( 'mut{}-name'.format( (i/3)+1 ) ) for i in range(12) }
-        yieldmap = { str(i+1): request.form.get( 'mut{}-yield'.format( (i/3)+1 ) ) for i in range(12) }
-        dilutionmap = { str(i+1): request.form.get( 'mut{}-dilution'.format( (i/3)+1 ) ) for i in range(12) }
+        samplemap = { str(i+1): request.form[ 'mut{}-name'.format( (i//3)+1 ) ] for i in range(12) }
+        yieldmap = { str(i+1): request.form[ 'mut{}-yield'.format( (i//3)+1 ) ] for i in range(12) }
+        dilutionmap = { str(i+1): request.form[ 'mut{}-dilution'.format( (i//3)+1 ) ] for i in range(12) }
 
         # construct a useful dataframe from the raw data
         df.dropna( inplace=True )
@@ -70,7 +86,7 @@ def simple():
         df[ 'kobs' ] = df.rate * 0.0002 / ( df[ 'yield' ] * df[ 'dilution' ] * 0.25 / extcoef )
 
         # save this data set
-        df.to_csv( '/data/bagel/uploads/submitted_{}.csv'.format( datetime.datetime.now() ) )
+        #df.to_csv( '/data/bagel/uploads/submitted_{}.csv'.format( datetime.datetime.now() ) )
 
         # group df by sample
         grouped = df.groupby( 'sample', sort=False )
@@ -143,6 +159,53 @@ def simple():
         # not a POST request, is GET request
         return render_template( 'plate.html' )
 
-# init Flask app if run as `python app.py`
-if __name__ == '__main__':
-    app.run()
+
+@app.route( '/thermal', methods=['GET', 'POST'] )
+def thermal():
+    print( request.method )
+    if request.method == 'POST':
+
+        clean_dat = request.form[ 'data' ].replace('Max V [420]', 'rate')
+
+        print( [ i for i in request.form.keys() ])
+
+        # turn into pandas df
+        df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
+
+        # map the form values to the DataFrame
+        samplemap = { str(i+1): request.form[ 'mut{}-name'.format( (i//3)+1 ) ] for i in range(12) }
+
+        # construct a useful dataframe from the raw data
+        df[ 'sample' ] = df['Well'].str[1:].map( samplemap )
+        df[ 'temp' ] = list( np.linspace( 50, 30, 8) ) * 12
+        #df.to_csv( '/data/bagel/uploads/thermal_submitted_{}.csv'.format( datetime.datetime.now() ) )
+
+        print( df )
+
+        # group df by sample
+        grouped = df.groupby( 'sample', sort=False )
+        result = []
+        #iterate over 4 samples by name, in entered order (see sort=False above)
+        for name, df in grouped:
+            rate = df.rate / df.rate.max()
+            params, errors = my_curve_fit( r, df.temp, rate, p0=(40,-1) )
+            fig, ax = plt.subplots( figsize=(3,3) )
+            ax.scatter( df.temp, rate, color='red' )
+            x_vals = np.linspace( 30, 50, 50 )
+            ax.plot( x_vals, r(x_vals, *params), color='black' )
+            ax.set_xticks([30, 35, 40, 45, 50])
+            ax.set_yticks([0, .25, .5, .75, 1])
+            ax.set_xlabel( 'Incubation temp. (˚C)' )
+            ax.set_ylabel( 'Normalized activity' )
+            fig.tight_layout()
+
+            # render into HTML
+            img = StringIO()
+            fig.savefig( img, format='svg' )
+            plt.close( fig )
+            img.seek( 0 )
+            result.append( ( name, params, errors, img.read() ) )
+
+        return render_template( 'thermal_results.html', result=result )
+    else:
+        return render_template( 'thermal.html' )
