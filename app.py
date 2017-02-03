@@ -141,12 +141,9 @@ def simple():
 # thermal stability
 @app.route( '/thermal', methods=['GET', 'POST'] )
 def thermal():
-    print( request.method )
     if request.method == 'POST':
 
         clean_dat = request.form[ 'data' ].replace('Max V [420]', 'rate')
-
-        print( [ i for i in request.form.keys() ])
 
         # turn into pandas df
         df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
@@ -158,8 +155,6 @@ def thermal():
         df[ 'sample' ] = df['Well'].str[1:].map( samplemap )
         df[ 'temp' ] = list( np.linspace( 50, 30, 8) ) * 12
         #df.to_csv( '/data/bagel/uploads/thermal_submitted_{}.csv'.format( datetime.datetime.now() ) )
-
-        print( df )
 
         # group df by sample
         grouped = df.groupby( 'sample', sort=False )
