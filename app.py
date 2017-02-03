@@ -1,15 +1,11 @@
 import pandas
 import datetime
-
 from numpy import diag, sqrt, linspace, array, nan, empty
 import numpy as np
 from scipy.optimize import curve_fit
-
 from matplotlib import use; use( 'Agg' )
 import matplotlib.pyplot as plt
-
 from io import StringIO
-
 from flask import Flask, request, render_template
 
 app = Flask( __name__ )
@@ -61,6 +57,7 @@ def do_fit( df ):
 s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
 extcoef = 113000
 
+# kinetics
 @app.route( '/', methods=['GET', 'POST'] )
 def simple():
     if request.method == 'POST':
@@ -103,44 +100,26 @@ def simple():
 
             # set up plot
             fig, ax = plt.subplots( figsize=(3,3) )
-            ax.scatter( df.s, df.kobs, color='k', marker='.' )
+            ax.scatter( df.s, df.kobs, color='orange' )
             ax.set_title( name )
-            ax.set_xlabel( '[pNPG] (M)' )
+            ax.set_xlabel( '[pNPG] (mM)' )
             ax.set_ylabel( 'Rate (min$^{-1}$)' )
-            ax.set_xticks( [ 0, 0.04, 0.08 ] )
+            ax.set_xticks([ 0, 0.025, 0.050, 0.075 ])
+            ax.set_xticklabels([0, 25, 50, 75])
             yticks = ax.get_yticks()
             ax.set_yticks( yticks[1:-1] )
             plt.tight_layout()
 
             xvals = linspace( df.s.min(), df.s.max(), 100 )
-
-            # make notes of possible errors
-            notes = []
-            if float( conc ) < 0.2:
-                notes.append( 'Protein yield is below 0.20 mg/mL' )
-
             # check if we have evidence of substrate inhibition
-            if popt_si.size == 3 and perr_si.size == 3:
-                if perr_si[2] < 100:
-                    if perr[0] > 25:
-                        notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
-                    if perr[1] > 25:
-                        notes.append( 'K<sub>M</sub> error is greater than 25%' )
-                    if popt[0] > 0.05:
-                        ax.plot( xvals, kobs_with_substrate_inhibition( xvals, *popt_si ), color='g', alpha=.7 )
-                else:
-                    # check if we have a MM fit
-                    if popt.size == 2 and perr.size == 2:
-                        if perr[0] > 25:
-                            notes.append( '<em>k</em><sub>cat</sub> error is greater than 25%' )
-                        if perr[1] > 25:
-                            notes.append( 'K<sub>M</sub> error is greater than 25%' )
-                        if popt[0] > 0.05:
-                            ax.plot( xvals, kobs( xvals, *popt ), alpha=0.7, color='k' )
-                    else:
-                      # neither fit acceptable
-                      popt = perr = array( [ nan, nan ] )
-                      notes.append( 'There was an error fitting data for {} to the Michaelis-Menten equation'.format( name ) )
+            if popt_si[2] < 0.075:
+                ax.plot( xvals, kobs_with_substrate_inhibition( xvals, *popt_si ), color='g' )
+            # check if we have MM
+            elif popt[0] > 0.1: # dumb check
+                ax.plot( xvals, kobs( xvals, *popt ), color='k' )
+            # neither fit acceptable
+            else:
+              popt = perr = array([ nan, nan ])
 
             # encode plot as a string
             img = StringIO()
@@ -148,18 +127,18 @@ def simple():
             plt.close( fig )
             img.seek( 0 )
 
-            # collect everything
-            samples.append( (
-                name, conc, dilution, popt, perr, popt_si, perr_si, img.read(), notes
-            ) )
+            notes = []
 
+            # collect everything
+            samples.append((
+                name, conc, dilution, popt, perr, popt_si, perr_si, img.read(), notes
+            ))
         return render_template( 'results.html', samples=samples )
 
-    else:
-        # not a POST request, is GET request
+    else: # not a POST request, is GET request
         return render_template( 'plate.html' )
 
-
+# thermal stability
 @app.route( '/thermal', methods=['GET', 'POST'] )
 def thermal():
     print( request.method )
