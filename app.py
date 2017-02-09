@@ -145,17 +145,23 @@ def simple():
 def thermal():
     if request.method == 'POST':
 
-        clean_dat = request.form[ 'data' ].replace('Max V [420]', 'rate')
+        clean_dat = request.form[ 'data' ].replace('Max V [420]', 'rate').strip() 
+	#clean_dat = request.form[ 'data' ].replace('Max V [420]', 'rate').replace(' ', '\n').lower()
 
         # turn into pandas df
         df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
+	print( df.columns ) 
+	print( df.shape ) 	
+	print( df.index ) 
+	print( df.head() ) 
+	print( df.tail() ) 
 
         # map the form values to the DataFrame
         samplemap = { str(i+1): request.form[ 'mut{}-name'.format( (i//3)+1 ) ] for i in range(12) }
 
         # construct a useful dataframe from the raw data
         df[ 'sample' ] = df['Well'].str[1:].map( samplemap )
-        df[ 'temp' ] = list( np.linspace( 50, 30, 8) ) * 12
+        df[ 'temp' ] = list( np.linspace( 50, 30, 8) ) * 12 
         #df.to_csv( '/data/bagel/uploads/thermal_submitted_{}.csv'.format( datetime.datetime.now() ) )
 
         # group df by sample
@@ -171,8 +177,8 @@ def thermal():
             ax.plot( x_vals, r(x_vals, *params), color='black' )
             ax.set_xticks([30, 35, 40, 45, 50])
             ax.set_yticks([0, .25, .5, .75, 1])
-            ax.set_xlabel( 'Incubation temp. (˚C)' )
-            ax.set_ylabel( 'Normalized activity' )
+            ax.set_xlabel( u'Incubation temp. (˚C)' )
+            ax.set_ylabel( u'Normalized activity' )
             fig.tight_layout()
 
             # render into HTML
