@@ -2,7 +2,6 @@
 
 import pandas
 import datetime
-from numpy import diag, sqrt, linspace, array, nan, empty
 import numpy as np
 from scipy.optimize import curve_fit
 from matplotlib import use; use( 'Agg' )
@@ -10,50 +9,12 @@ import matplotlib.pyplot as plt
 from io import StringIO
 from flask import Flask, request, render_template
 
+from fit import kobs, kobs_with_substrate_inhibition, r, my_curve_fit, do_substrate_inhibition_fit, do_fit
+
+
 app = Flask( __name__ )
 app.debug = True
 
-def kobs( s, kcat, km ):
-    return (kcat*s)/(km+s)
-
-def kobs_with_substrate_inhibition( s, kcat, km, ks ):
-    return (kcat*s)/(km+s*(1+(s/ks)))
-
-def r( x, x0, k ):
-    return 1 / ( 1 + np.exp( -k * ( x - x0 ) ) )
-
-def my_curve_fit( f, xdata, ydata, p0 ):
-    null_return = [ [ np.nan ] * len(p0) ] * 2
-    try:
-        curve_return = curve_fit( f, xdata, ydata, p0 )
-        if len( curve_return ) == 2:
-            errors = np.sqrt( np.diag( curve_return[1] ) )
-            return curve_return[0], errors
-        else:
-            return null_return
-    except:
-        return null_return
-
-def do_substrate_inhibition_fit( df ):
-    try:
-        p0 = ( df.kobs.max(), df.s.mean(), 0.04 )
-        popt, pcov = curve_fit( kobs_with_substrate_inhibition, df.s, df.kobs, p0=p0 )
-        perr = sqrt( diag( pcov ) ) / popt * 100
-        return popt, perr
-    except Exception as e:
-        #print( e )
-        empty3 = array( [nan, nan, nan] )
-        return empty3, empty3
-
-def do_fit( df ):
-    try:
-        p0 = ( df.kobs.max(), df.s.mean() )
-        popt, pcov = curve_fit( kobs, df.s, df.kobs, p0=p0 )
-        perr = sqrt( diag( pcov ) ) / popt * 100
-        return popt, perr
-    except Exception as e:
-        #print( e )
-        return array( [] ), array( [] )
 
 # BglB-specific values below!
 s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
@@ -112,7 +73,7 @@ def simple():
             ax.set_yticks( yticks[1:-1] )
             plt.tight_layout()
 
-            xvals = linspace( df.s.min(), df.s.max(), 100 )
+            xvals = np.linspace( df.s.min(), df.s.max(), 100 )
             # check if we have evidence of substrate inhibition
             if popt_si[2] < 0.075:
                 ax.plot( xvals, kobs_with_substrate_inhibition( xvals, *popt_si ), color='g' )
@@ -121,7 +82,7 @@ def simple():
                 ax.plot( xvals, kobs( xvals, *popt ), color='k' )
             # neither fit acceptable
             else:
-              popt = perr = array([ nan, nan ])
+              popt = perr = array([ np.nan, np.nan ])
 
             # encode plot as a string
             img = StringIO()
