@@ -1,0 +1,52 @@
+{% extends "base.htm" %}
+{% block title %}Enzyme Design Kit (EDK){% endblock %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="hero">
+
+    <div class="junk" style="height:2rem;"></div>
+
+    <h1>Enzyme Design Kit</h1>
+    <p>A collection of tools for use in rational enzyme design efforts</p>
+
+    <div class="row">
+      <div class="col-4">
+        <img src="/static/hero_kinetics.svg">
+        <h3>Michaelis-Menten Kinetics</h3>
+        <p>
+          Determine kcat and KM by fitting data to
+        </p>
+        <a href="{{ url_for('kinetics') }}" class="btn btn-primary">Try it</a href>
+      </div>
+      <div class="col-4">
+        <img src="/static/hero_thermal.svg">
+        <h3>Protein Melting Temperature</h3>
+        <p>
+          Determine kcat and KM by fitting data to
+        </p>
+        <a href="{{ url_for('thermal') }}" class="btn btn-primary">Try it</a href>
+      </div>
+      <div class="col-4">
+        <img src="/static/hero_kunkel.png">
+        <h3>Mutagenic Oligo Design</h3>
+        <p>
+          Determine kcat and KM by fitting data to
+        </p>
+        <a href="{{ url_for('oligo_design') }}" class="btn btn-primary">Try it</a href>
+      </div>
+    </div>
+
+    <div class="junk" style="height:20rem;"></div>
+
+  </div>
+</div>
+{% endblock %}
+{% block footer %}
+<p>Credits: made by Alex Carlin. Apps by Alex Carlin and Steve Bertolani. Tested by members of the Siegel Lab at UCD.</p>
+{% endblock %}

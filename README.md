@@ -29,5 +29,11 @@ This app allows you to determine
 
 ## How to add a new app (Contributing) 
 
-Glad you asked! The simple answer is: create a new Python file, write a Flask view function, and import it into "application.py". 
+Glad you asked! The simple answer is: create a new Python file, write a Flask view function, and import it into "application.py". A more thorough answer:
+
+- make a new directory in templates/ called "my_app" or whatever 
+- create a new python file called "my_app.py" 
+- write your code in my_app.py 
+- write a view function in `app.py` that calls your code to do its work 
+
 

@@ -1,0 +1,29 @@
+{% extends "base.htm" %}
+{% block title %}Results{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+
+
+<div class="card-group">
+  {% for name, conc, dilution, popt, perr, popt_si, perr_si, plot, notes in samples %}
+  <div class="card">
+    <img class="card-img-top" src="data:image/svg+xml;utf8,{{plot}}" alt="Card image cap">
+
+    {% for note in notes %}
+      <p>{{note|safe}}</p>
+    {% endfor %}
+
+    <div class="card-block">
+      <h4 class="card-title">{{name}}</h4>
+      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+    </div>
+    <div class="card-footer">
+      <small class="text-muted">Last updated 3 mins ago</small>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

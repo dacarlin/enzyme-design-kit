@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
 
+from flask import Flask, request, render_template
 import pandas
 import datetime
 import numpy as np
-from scipy.optimize import curve_fit
+from io import StringIO
+
 from matplotlib import use; use( 'Agg' )
 import matplotlib.pyplot as plt
-from io import StringIO
-from flask import Flask, request, render_template
 
 from fit import kobs, kobs_with_substrate_inhibition, r, my_curve_fit, do_substrate_inhibition_fit, do_fit
-
 
 app = Flask( __name__ )
 app.debug = True
 
+@app.route('/')
+def home():
+  return render_template('home.htm')
 
 # BglB-specific values below!
 s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
 extcoef = 113000
 
 # kinetics
-@app.route( '/', methods=['GET', 'POST'] )
-def simple():
+@app.route( '/kinetics', methods=['GET', 'POST'] )
+def kinetics():
     if request.method == 'POST':
 
         # read in form
@@ -96,10 +98,10 @@ def simple():
             samples.append((
                 name, conc, dilution, popt, perr, popt_si, perr_si, img.read(), notes
             ))
-        return render_template( 'results.html', samples=samples )
+        return render_template( 'kinetics/results.htm', samples=samples )
 
     else: # not a POST request, is GET request
-        return render_template( 'plate.html' )
+        return render_template( 'kinetics/input.htm' )
 
 # thermal stability
 @app.route( '/thermal', methods=['GET', 'POST'] )
@@ -143,6 +145,10 @@ def thermal():
             img.seek( 0 )
             result.append( ( name, params, errors, img.read() ) )
 
-        return render_template( 'thermal_results.html', result=result )
+        return render_template( 'thermal/results.htm', result=result )
     else:
-        return render_template( 'thermal.html' )
+        return render_template( 'thermal/input.htm' )
+
+@app.route('/oligo_design')
+def oligo_design():
+    return 'Oligo design'
