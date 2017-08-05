@@ -20,20 +20,19 @@ A collection of useful tools for students and practioners of enzyme design. A li
 As of version 1.0, these are the available tools. 
 
 ### Determine <em>k</em><sub>cat</sub> and K<sub>M</sub> from kinetic data at various substrate concentrations   
-
 This app allows you to fit you experimental data to the Michaelis-Menten equation to obtain the <em>k</em><sub>cat</sub> and K<sub>M</sub>. 
 
 ### Determine protein melting temperature from heat challenge data 
 
-This app allows you to determine 
+This app allows you to determine protein melting temperature from heat challenge data 
 
 ## How to add a new app (Contributing) 
 
-Glad you asked! The simple answer is: create a new Python file, write a Flask view function, and import it into "application.py". A more thorough answer:
+Glad you asked! The simple answer is: create a new Python file in this directory, write a Flask view function, and import it into "application.py", and add a URL for it. A more thorough answer:
 
 - make a new directory in templates/ called "my_app" or whatever 
-- create a new python file called "my_app.py" 
+- create a new python module called "my_app.py" 
 - write your code in my_app.py 
-- write a view function in `app.py` that calls your code to do its work 
-
+- write a view function in `app.py` that calls your code
+- optionally, write some tests for your module (recommended) 
 

@@ -13,7 +13,7 @@
 }
 
 /* hide the example form */
-.example div {
+div.hide {
   display: none;
 }
 
@@ -32,7 +32,32 @@ img {
 }
 
 #footer {
+  margin-top: 2em;
   font-size: 0.8rem;
   color: #666;
-  text-align: center; 
+  text-align: center;
+}
+
+/* mutant cards */
+
+.sc {
+  text-transform: uppercase;
+  font-size: 44%;
+  font-weight: bold;
+}
+
+/*heros*/
+
+img.hero_img {
+    width: 60%;
+    padding: 2em; 
+}
+
+/*oligo design*/
+
+form textarea#sequence_text {
+  font-family: monospace;
+  font-size: 12px;
+  width: 100%;
+  height: 10em;
 }

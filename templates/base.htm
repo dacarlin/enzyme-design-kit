@@ -18,12 +18,25 @@
       <b>Enzyme Design Kit</b>
       <a href="{{ url_for('kinetics') }}">Kinetics (<em>k</em><sub>cat</sub> and K<sub>M</sub>)</a>
       <a href="{{ url_for('thermal') }}">Thermal Stability (<em>T</em><sub>50</sub>)</a>
+      <a href="{{ url_for('oligo_design') }}">Mutagenic oligo design</a>
     </div>
     <div class="container">
     {% block content %}{% endblock %}
     </div>
     <div id="footer">
     {% block footer %}{% endblock %}
+    <p>
+      <br>
+      <strong>Tools:</strong>
+      <a href="{{ url_for('kinetics') }}">Kinetics (<em>k</em><sub>cat</sub> and K<sub>M</sub>)</a>,
+      <a href="{{ url_for('thermal') }}">Thermal Stability (<em>T</em><sub>50</sub>)</a>,
+      <a href="{{ url_for('oligo_design') }}">Mutagenic oligo design</a>
+    </p>
+    <p>
+      Created by <a href="http://github.com/dacarlin">Alex Carlin</a> in the <a href="">Siegel Lab at University of California, Davis</a>
+      &mdash;
+      Code <a href="http://github.com/dacarlin/bglb_fitter">on GitHub</a>
+    </p>
     </div>
 </body>
 </html>

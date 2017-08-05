@@ -11,16 +11,58 @@
   <div class="card">
     <img class="card-img-top" src="data:image/svg+xml;utf8,{{plot}}" alt="Card image cap">
 
-    {% for note in notes %}
-      <p>{{note|safe}}</p>
-    {% endfor %}
 
     <div class="card-block">
-      <h4 class="card-title">{{name}}</h4>
-      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+      <h3 class="card-title">{{name}}</h3>
+      <p>
+        <span class="sc">Yield</span> {{conc}} mg/mL
+        <br>
+        <span class="sc">Dilution</span> {{dilution|round(2)}}
+      </p>
+
+      <!-- <h6>Least-squares</h6>
+      <p class="card-text">
+        <small><code>{{popt}}</code></small>
+        <small><code>{{perr}}</code></small>
+      </p> -->
+
+      <h5>Parameter estimates</h5>
+      <p>
+        Kinetic parameters for {{name}} were estimated to be
+        {{ '%.2e ± %.2e' % (popt[0], perr[0]) }} min<sup>&ndash;1</sup> (<em>k</em><sub>cat</sub>),
+        and {{ '%.2e ± %.2e' % (popt[1], perr[1]) }} M (K<sub>M</sub>)
+      </p>
+      <table class='table card-table'>
+        <tr>
+          <td></td>
+          <td><span class="sc">Estimate</span></td>
+          <td><span class="sc">Error</span></td>
+        </tr>
+        <tr>
+          <td><em>k</em><sub>cat</sub></td>
+          <td>{{ '%.2e' % popt[0]}}</td>
+          <td>{{ '%.2e' % perr[0]}}</td>
+        </tr>
+        <tr>
+          <td>K<sub>M</sub></td>
+          <td>{{ '%.2e' % popt[1]}}</td>
+          <td>{{ '%.2e' % perr[1]}}</td>
+        </tr>
+      </table>
+
+      {% if notes %}
+      <h5>Statistical analysis</h5>
+      <ul>
+      {% for note in notes %}
+        <li>{{note}}</li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+
+
     </div>
-    <div class="card-footer">
-      <small class="text-muted">Last updated 3 mins ago</small>
+    <div class="card-footer" style="text-align:center;">
+      <a class="btn btn-sm" href="{{data_url}}">Download Result</a>
     </div>
   </div>
   {% endfor %}
