@@ -1,0 +1,13 @@
+{% extends "base.htm" %}
+{% block title %}Results{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+
+
+<p>Preview of results of oligo design: <code>{{preview_string}}</code></p>
+
+<p>FASTA file containing oligos: <a class="btn" href="">Download</a></p>
+
+{% endblock %}

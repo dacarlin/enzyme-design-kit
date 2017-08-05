@@ -1,0 +1,20 @@
+{% extends "base.htm" %}
+{% block title %}Enzyme Design Kit (EDK){% endblock %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+Uploads
+
+<ol>
+  {% for upload in uploads %}
+  <li>{{upload}}</li>
+  {% endfor %}
+</ol>
+
+</div>
+{% endblock %}

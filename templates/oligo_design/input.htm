@@ -1,0 +1,58 @@
+{% extends "base.htm" %}
+{% block title %}Enzyme Design Kit: Oligo Design{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <h1>Design oligos for Kunkel mutagenesis</h1>
+      <p>
+        This tool will create mutageneic oligos for Kunkel mutagenesis.
+        The codons substituted are for <em>Escherichia coli</em> and are probably
+        not great for other expression organisms. Oligos are of a fixed length (33 bp),
+        and so the first oligo created is for the fifth amino acid residue in the
+        open reading frame. The names of the oligos in the
+      </p>
+    </div>
+    <div class="col-6">
+      <form class="form" action="" method="post">
+        <div class="form-group">
+          <p>
+            <label for="sequence_text">Paste a FASTA nucleotide sequence: </label>
+          </p>
+          <textarea class="form-group" name="sequence_text" id="sequence_text">
+>BglB
+AACACCTTTATCTTTCCGGCAACCTTTATGTGGGGCACCAGCACCAGCAGCTATCAGATTGAAGG
+TGGCACCGATGAAGGTGGTCGTACCCCGAGCATTTGGGATACCTTTTGTCAGATTCCGGGTAAAG
+TTATTGGTGGTGATTGTGGTGATGTTGCCTGTGATCATTTTCACCACTTTAAAGAAGATGTGCAG
+CTGATGAAACAGCTGGGTTTTCTGCATTATCGTTTTAGCGTTGCATGGCCTCGTATTATGCCTGC
+AGCAGGTATTATCAATGAAGAGGGTCTGCTGTTTTATGAGCATCTGCTGGATGAAATTGAACTGG
+CAGGTCTGATTCCGATGCTGACCCTGTATCATTGGGATCTGCCGCAGTGGATTGAAGATGAAGGC
+GGTTGGACCCAGCGTGAAACCATTCAGCATTTCAAAACCTATGCCAGCGTTATCATGGATCGTTT
+TGGTGAACGTATTAATTGGTGGAACACCATCAATGAACCGTATTGTGCAAGCATTCTGGGTTATG
+GCACCGGTGAACATGCACCGGGTCATGAAAATTGGCGTGAAGCATTTACCGCAGCACATCATATT
+CTGATGTGTCATGGTATTGCAAGCAACCTGCATAAAGAAAAAGGTCTGACCGGTAAAATTGGCAT
+          </textarea>
+        </div>
+        <div class="form-group">
+          <label for="direction">
+            Strand directionality:
+          </label>
+          <select name="direction" required>
+            <option value="antisense">Antisense (non-coding)</option>
+            <!-- <option value="sense">Sense (coding)</option> -->
+          </select>
+        </div>
+        <div class="form-group pull-right">
+          <input class="btn btn-primary" type="submit" value="Generate Oligos">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

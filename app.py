@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, render_template
-import pandas
 import datetime
-import numpy as np
 from io import StringIO
-
-from Bio import SeqIO
-from skbio import DNA
 from glob import glob
 
+import pandas
+import numpy as np
+from flask import Flask, request, render_template
 from matplotlib import use; use( 'Agg' )
 import matplotlib.pyplot as plt
 
 from fit import kobs, kobs_with_substrate_inhibition, r, my_curve_fit, do_substrate_inhibition_fit, do_fit
+from oligo import generate_oligos
 
-app = Flask( __name__ )
+app = Flask(__name__)
 app.debug = True
 
 @app.route('/')
@@ -23,16 +21,17 @@ def home():
   return render_template('home.htm')
 
 # BglB-specific values below!
-s = [ 0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0 ]
+s = [0.075, 0.01875, 0.0047, 0.0012, 0.0003, 0.000075, 0.000019, 0]
 extcoef = 113000
 
 def get_data_sets():
-    data_sets = []
-    for g in glob('/static/data_sets/*.csv'):
-        with open(g) as fn:
-            data_sets.append(g, fn.read())
-    print(data_sets)
-    return dict(data_sets)
+    data_sets = ['good', 'bad']
+    data = []
+    for ds in data_sets:
+        path = 'static/data_sets/{}.csv'.format(ds)
+        with open(path) as fn:
+            data.append(fn.read())
+    return dict(zip(data_sets, data))
 
 # kinetics
 @app.route( '/kinetics', methods=['GET', 'POST'] )
@@ -40,7 +39,7 @@ def kinetics():
     if request.method == 'POST':
 
         # read in form
-        clean_dat = request.form[ 'data' ].replace('Max V [420]', 'rate').replace(' ', '\n').lower()
+        clean_dat = request.form['data'].replace('Max V [420]', 'rate').replace(' ', '\n').lower()
 
         # turn into pandas df
         df = pandas.read_csv( StringIO( clean_dat ), sep='\t' )
@@ -64,7 +63,7 @@ def kinetics():
         #df.to_csv( '/data/bagel/uploads/submitted_{}.csv'.format( datetime.datetime.now() ) )
 
         # group df by sample
-        grouped = df.groupby( 'sample', sort=False )
+        grouped = df.groupby('sample', sort=False)
         samples = [ ]
 
         # iterate over 4 samples by name, in entered order (see sort=False above)
@@ -174,37 +173,11 @@ def thermal():
 def oligo_design():
     if request.method == 'POST':
         sequence_text = request.form['sequence_text']
-        record = next(SeqIO.parse(StringIO(sequence_text), 'fasta'))
-        print(record)
-
-        ecoli_favorite = {
-            'G':'GGC', 'A':'GCG', 'V':'GTG', 'F':'TTT', 'E':'GAA',
-            'D':'GAT', 'N':'AAC', 'C':'TGC', 'K':'AAA', 'L':'CTG',
-            'H':'CAT', 'P':'CCG', 'Q':'CAG', 'W':'TGG', 'Y':'TAT',
-            'I':'ATT', 'M':'ATG', 'R':'CGT', 'T':'ACC', 'S':'AGC',
-        }
-
-        dna = DNA.read(StringIO(sequence_text))
-        kmers = [dna[i:i+33] for i in range(0, len(dna), 3)]
-
-        my_oligos = []
-        for i, k in enumerate(kmers):
-            for aa, codon in ecoli_favorite.items():
-                my_str = str( k[:15] ) + codon + str( k[18:] )
-                my_dna = DNA( my_str )
-                my_oligo = my_dna.reverse_complement()
-                my_name = str( k[15:18].translate() ) + str( i + 6 ) + aa
-                if len( my_oligo ) == 33:
-                    my_oligos.append('>{}\n{}\n'.format(my_name, my_oligo))
-        my_oligos = ''.join(my_oligos)
-        # path = os.path.join('/data/bagel/uploads/oligos_{}.fa'.format(datetime.datetime.now()))
-        # with open(path, 'w') as fn: fn.write(my_oligos)
-
-        preview_string = my_oligos[0:1000]
+        my_oligos = generate_oligos(StringIO(sequence_text))
+        preview_string = my_oligos[0:100]
         return render_template('oligo_design/output.htm', preview_string=preview_string, fasta_file=my_oligos)
     else: # get
-        things_to_render = []
-        return render_template('oligo_design/input.htm', things_to_render=things_to_render)
+        return render_template('oligo_design/input.htm')
 
 @app.route('/uploads')
 def uploads():
